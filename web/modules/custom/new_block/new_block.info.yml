@@ -1,0 +1,6 @@
+name: Custom Block
+description: This is custom module.
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: module
+type: module

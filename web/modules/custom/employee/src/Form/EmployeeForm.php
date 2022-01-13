@@ -48,7 +48,7 @@
                );
 
                $form['save'] = array(
-                    '#type' =>'submit',
+                    '#type' =>'actio',
                     '#title'=>'Save Employee',
                     '#button_type'=>'primary'
                );
