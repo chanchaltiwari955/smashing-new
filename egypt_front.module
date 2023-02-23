@@ -1,0 +1,87 @@
+<?php
+
+use Drupal\Core\Url;
+/**
+ * Implements hook_theme().
+ */
+function egypt_front_theme($existing, $type, $theme, $path) {
+  return [
+    'page_EU_support_to_egypt' => [
+      'variables' => [
+        'data' => NULL,
+        'outcome' => NULL,
+        'module_path' => NULL,
+      ],
+      'template' => 'page--EU-support-to-egypt',
+    ],
+  ];
+}
+
+/**
+ * Function to get loop count.
+ */
+function egypt_front_get_loop_count() {
+
+  return [
+    'start_loop' => 1,
+    'end_loop' => 6,
+  ];
+}
+
+/*
+ ** Function to get list of country for egypt domain homepage map.
+ */
+ function egypt_front_map_country_list() {
+  return [
+    'EGY1530' => 'Gharbeya',
+    'EGY1531' => 'Ismailia',
+    'EGY1532' => 'Menufiya',
+    'EGY1533' => 'Cairo',
+    'EGY1534' => 'Qaliubiya',
+    'EGY1535' => 'Sharqeya',
+    'EGY1536' => 'Suez',
+    'EGY1537' => 'Daqahleya',
+    'EGY1538' => 'Port Said',
+    'EGY1539' => 'Damietta',
+    'EGY1540' => 'Matrouh',
+    'EGY1541' => 'Beheira',
+    'EGY1542' => 'Fayoum',
+    'EGY1543' => 'Alexandria',
+    'EGY1544' => 'Giza',
+    'EGY1545' => 'Minya',
+    'EGY1546' => 'Beni Suef',
+    'EGY1547' => 'Kafr al-Sheikh',
+    'EGY1548' => 'Aswan',
+    'EGY1549' => 'Assiut',
+    'EGY1550' => 'Al-Wadi al-Gadid',
+    'EGY1551' => 'Qena',
+    'EGY1552' => 'Sohag',
+    'EGY1556' => 'Red Sea',
+    'EGY1557' => 'South Sinai',
+    'EGY1558' => 'North Sinai',
+    'EGY5494' => 'Luxor',
+  ];
+}
+
+function egypt_front_menu_local_tasks_alter(&$data, $route_name, \Drupal\Core\Cache\RefinableCacheableDependencyInterface &$cacheability) {
+
+  // Add a tab linking to node/add to all pages.
+  $data['tabs'][0]['egypt_front.header_config_form'] = [
+    // '#theme' => 'EgyptHeaderForm',
+    '#link' => [
+      'title' => t('Example tab'),
+      'url' => Url::fromRoute('egypt_front.header_config_form'),
+      'localized_options' => [
+        'attributes' => [
+          'title' => t('Add content'),
+        ],
+      ],
+    ],
+  ];
+
+  // The tab we're adding is dependent on a user's access to add content.
+  // $cacheability
+  //   ->addCacheContexts([
+  //   'user.permissions',
+  // ]);
+}

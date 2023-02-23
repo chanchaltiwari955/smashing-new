@@ -1,0 +1,187 @@
+<style type="text/css">
+	.unfpa-home .unfpa-main-info__img {
+		background-image: url({{file_url(data.mi_desktop_url[0])}});
+	}
+	.unfpa-home .unfpa-cover__img {
+		background-image: url({{file_url(data.desktop_url[0])}});
+	}
+</style>
+<div id="container" class="clearfix">
+	<main class="unfpa-main">
+		<section class="unfpa-home unfpa-page">
+			<div class="unfpa-page__wrapper">
+				<div class="unfpa-side-menu">
+					<div class="component-side-menu" id="unfpa-side-menu">
+						<div class="mobile-arrow">
+							<img src="{{module_path}}/assets/image/down-arrow.svg">
+						</div>
+						<div class="menu">
+							<div class="down-arrow">
+								<img src="{{module_path}}/assets/image/down-arrow.svg">
+							</div>
+							<div class="wrapper">
+								<a class="side-menu__item" href="{{ base_url }}/latest-EU-Support">
+									<div class="icon"><img src="{{module_path}}/assets/image/news.svg"></div>
+									<div class="caption">{{ 'News'|t }}</div>
+								</a>
+								<a class="side-menu__item" href="{{ base_url }}/latest-EU-Support">
+									<div class="icon"><img src="{{module_path}}/assets/image/publication.png"></div>
+									<div class="caption">{{ 'Publications'|t }}</div>
+								</a>
+								<a class="side-menu__item" href="#about">
+									<div class="icon"><img src="{{module_path}}/assets/image/about.svg"></div>
+									<div class="caption">{{ 'About'|t }}</div>
+								</a>
+								<a class="side-menu__item" href="#outcomes">
+									<div class="icon"><img src="{{module_path}}/assets/image/outcomes.svg"></div>
+									<div class="caption">{{ 'Outcomes'|t }}</div>
+								</a>
+							</div>
+							<div class="overlay-button"></div>
+						</div>
+					</div>
+				</div>
+				<div class="unfpa-cover">
+					<div class="unfpa-center-wrapper">
+						<div class="unfpa-cover__content">
+							<div class="unfpa-cover__img"></div>
+							
+							<div class="unfpa-cover__stars">
+							<img src="{{module_path}}/assets/image/stars.svg" alt="" srcset="">
+							</div>
+							<h1>
+              {{ data.header_eg_title }}
+              </h1>
+							<h5>
+              {{ data.header_eg_subtitle }}
+              </h5>
+						</div>
+					</div>
+				</div>
+				{% if latest is defined %}
+				<div id="news" class="unfpa-center-wrapper">
+					<h3 class="block-title">{{ 'Latest'|t }}</h3>
+					{{ latest }}
+				</div>
+				<div id="publication" class="unfpa-center-wrapper">
+					<h3 class="block-title">{{ 'Publications'|t }}</h3>
+					{{ front_publication }}
+				</div>
+				{% endif %}
+				<div class="unfpa-main-info" id="about">
+					<div class="unfpa-main-info__img"></div>
+					<div class="unfpa-center-wrapper">
+						<h2>
+            {{ data.mi_title|striptags }}
+            </h2>
+						<p>
+						{{ data.mi_descr|striptags }}
+						</p>
+						<button class="unfpa-button unfpa-button--black" data-more="{{ 'Read more'|t }}" data-less="{{ 'Read less'|t }}">
+							<svg viewbox="0 0 9 49" xmlns="http://www.w3.org/2000/svg">
+								<path d="M4.95606 1V.5H3.95605V1h1.00001zm0 46.9127V1H3.95605v46.9127h1.00001z"/>
+								<path class="arrow" d="M4.81044 48.2354c-.19526.1953-.51185.1953-.70711 0L.921349 45.0535c-.195262-.1953-.195262-.5119 0-.7071.195261-.1953.511851-.1953.707111 0L4.4749 47.2l2.81041-2.8536c.19526-.1953.51185-.1953.70711 0 .19526.1952.19526.5118 0 .7071l-3.18198 3.1819z"/>
+							</svg>
+							<span>{{ 'Read more'|t }}</span>
+						</button>
+					</div>
+				</div>
+				<div class="unfpa-map-container">
+					<div class="unfpa-center-wrapper">
+						<h3>{{ map_block_title }}</h3>
+						<div id="unfpa-map">
+							<div id="unfpa-map-select">
+								<select>
+									<option value="" selected disabled hidden>
+                   {{ 'Select the region'|t }}</option>
+								</select>
+								<img src="{{module_path}}/assets/image/down-arrow.svg">
+							</div>
+							<div id="unfpa-map-svg">
+							<img src = "{{module_path}}/assets/image/map.svg">
+							</div>
+							<div id="unfpa-map-name"></div>
+							<div id="unfpa-map-tooltip">
+								<div class="close">
+									<svg viewbox="0 0 13 13" xmlns="http://www.w3.org/2000/svg">
+										<path fill-rule="evenodd" clip-rule="evenodd" d="M.846447 1.48359L1.55356.776489 2.93353 2.15647c.50006.50006.84085.84097 1.37919 1.38034.25798.25847.46037.46164.65993.66197.22017.22101.43691.43857.72106.72314.2693.2697.61443.61484.89231.89261l.13504.13497.11548-.11537c.26679-.26661.598-.59782.85621-.85674.2238-.22441.40607-.40825.58348-.58717.2287-.23066.44931-.45317.74038-.74393.25389-.25362.45443-.45177.65285-.6478l.0142-.01404c.20303-.20059.40514-.4004.66274-.65798.2579-.25785.5872-.58966.8524-.85738l.4649-.469842.712.702142-.4665.47148c-.2654.26793-.5961.60112-.8557.86071-.2598.25987-.4638.46148-.667.66222l-.0135.01334c-.1986.19624-.39759.39282-.64965.64463-.2917.29138-.50785.5094-.73367.73717-.17675.17828-.35942.36252-.58886.59259-.25884.25955-.59055.59125-.85741.85794l-.115.11488.11495.11488c.26682.2667.59844.59832.85729.85764.22338.22377.40306.40451.5764.57887.23064.232.45006.45271.74625.74848.24028.23994.4396.43729.6377.63343.2148.21275.4283.42405.691.68685.2596.2596.5906.5927.8563.8605l.4665.4707-.7102.704-.4662-.4704c-.2656-.2677-.5954-.5996-.8535-.8577-.274-.274-.47705-.475-.68328-.6791-.19225-.1903-.38724-.38335-.64493-.64067-.29613-.29572-.51866-.51955-.75121-.75347-.17366-.17467-.3529-.35496-.57256-.57501-.25845-.25891-.58974-.59021-.85651-.85686l-.1149-.11482-.1348.13511c-.27783.27843-.62318.62445-.89309.89462-.35447.35483-.60676.60704-.89132.8915-.14791.14787-.30453.30444-.48876.48867L1.55414 12.533l-.707704-.7065L3.60642 9.06648c.1843-.1843.34089-.34084.48869-.4886.28459-.2845.5366-.53642.89106-.89123.26968-.26996.61487-.61581.89267-.89422l.13532-.13562-.13512-.13504c-.27792-.27782-.62332-.62322-.89296-.89326-.28241-.28283-.50109-.50235-.72282-.72492-.20049-.20126-.40348-.40502-.65832-.66035-.53803-.53905-.87857-.87972-1.37851-1.37966L.846447 1.48359z"/>
+									</svg>
+								</div>
+								<div class="name"></div>
+								<p class="copy"></p>
+								<a class="read-more" href="#">{{ 'Read more'|t }}</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="unfpa-outcomes" id="outcomes">
+					<div class="unfpa-center-wrapper">
+						<ul class="unfpa-outcomes__accordion">
+						{% for key, item in outcome %}
+							<li>
+								<div class="title-bar">
+									<span>{{ 'Outcome'|t }}</span>
+									<hr/>
+									<h5><span class="number">0{{ key }}</span></h5>
+								</div>
+								<div class="content" style="height: 237px;">
+									<h1>
+                  {{ item.title }}
+                  </h1>
+									{{ item.description }}
+									<button class="unfpa-button unfpa-button--black" data-more="{{ 'Read more'|t }}" data-less="{{ 'Read less'|t }}">
+										<svg viewbox="0 0 9 49" xmlns="http://www.w3.org/2000/svg">
+											<path d="M4.95606 1V.5H3.95605V1h1.00001zm0 46.9127V1H3.95605v46.9127h1.00001z"/>
+											<path class="arrow" d="M4.81044 48.2354c-.19526.1953-.51185.1953-.70711 0L.921349 45.0535c-.195262-.1953-.195262-.5119 0-.7071.195261-.1953.511851-.1953.707111 0L4.4749 47.2l2.81041-2.8536c.19526-.1953.51185-.1953.70711 0 .19526.1952.19526.5118 0 .7071l-3.18198 3.1819z"/>
+										</svg>
+										<span>{{ 'Read more'|t }}</span>
+									</button>
+								</div>
+							</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+				<div class="unfpa-eu">
+					<a href="{{ flag_icon_link }}" target="_blank"><img class="unfpa-eu__flag" src="{{module_path}}/assets/image/eu-flag.svg"/></a>
+					<h5>{{ 'Project funded by the European Union.'|t }}</h5>
+					<div class="unfpa-eu__social">
+						<a href="https://www.facebook.com/EUinEgypt/" target="_blank">
+							<svg viewbox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+								<path fill-rule="evenodd" clip-rule="evenodd" d="M28 0H0v28h28V0zM15.1925 15.2455V23h-2.8283v-7.7545H10v-3.0218h2.3642V9.995C12.3642 7.40845 13.7956 6 15.887 6c1.0017 0 1.8626.08245 2.113.119v2.703l-1.4497.00085c-1.1378 0-1.3578.59585-1.3578 1.47135v1.9295h2.7123l-.3536 3.0218h-2.3587z"/>
+							</svg>
+						</a>
+						<a href="https://twitter.com/EUinEgypt" target="_blank">
+							<svg viewbox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+								<path fill-rule="evenodd" clip-rule="evenodd" d="M28 0H0v28h28V0zm-6.9526 10.9443C21.0474 15.6144 17.3328 21 10.54 21c-2.08582 0-4.02639-.5852-5.66087-1.5875.28907.0326.58294.0489.88102.0489 1.73025 0 3.32247-.5649 4.58655-1.5129-1.61645-.0287-2.97976-1.0505-3.44991-2.4547.225.0413.45636.0638.69427.0638.33692 0 .66336-.0436.97357-.1243-1.68975-.3241-2.96286-1.7531-2.96286-3.4649 0-.0155 0-.0303.00078-.045.49774.2649 1.06699.4242 1.67263.442-.99137-.6332-1.64338-1.7157-1.64338-2.94182 0-.64728.18274-1.25417.50019-1.7763C7.95322 9.7857 10.6748 11.1922 13.7439 11.3398c-.0633-.2588-.0957-.5284-.0957-.8058 0-1.95116 1.6539-3.534 3.6935-3.534 1.062 0 2.0218.42968 2.6956 1.11661.8412-.1586 1.6312-.45298 2.345-.85794-.2761.82534-.8615 1.51763-1.6239 1.9551.747-.0855 1.459-.27511 2.1207-.55633-.4944.70864-1.1213 1.33102-1.8422 1.82986.0072.1515.0105.3039.0105.457z"/>
+							</svg>
+						</a>
+					</div>
+					<p>{{ 'This webpage has been produced with the assistance of the European Union. The contents of this page are the sole responsibility of UNFPA and can in no way be taken to reflect the views of the European Union.'|t }}</p>
+				</div>
+
+			</div>
+		</section>
+	</main>
+	{% if new_home_page == 'new-home-page' %}
+		{{ common_footer }}
+		<footer id="footer" role="contentinfo" class="clearfix">
+			<div class="max_wrapper">
+				<div class="footer_area">
+					<div id="footer_social">
+						<div id="footer_logo">
+							{{ footer_logo }}
+						</div>
+						{{ footer_social }}
+					</div>
+					<div id="footer_links">
+						{{ footer_links }}
+					</div>
+					{{ feed_icons }}
+				</div>
+			</div>
+		</footer>
+	{% endif %}
+	<!-- /#footer -->
+</div>
+<!-- /#container -->

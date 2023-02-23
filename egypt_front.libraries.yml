@@ -1,0 +1,10 @@
+egypt_front_library:
+  version: 1.x
+  css:
+    theme:
+      assets/css/main.css: {}
+  js:
+    assets/js/main.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
