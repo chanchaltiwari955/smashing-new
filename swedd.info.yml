@@ -1,0 +1,19 @@
+name: SWEDD Website
+type: theme
+description: SWEDD Website custom theme.
+core_version_requirement: ^8.8 || ^9
+base theme: false
+libraries:
+  - swedd/swedd-libraries
+
+regions:
+  header: 'Header'
+  main_navigation: 'Main Navigation'
+  language_switcher: 'Language Switcher'
+  search: 'Search'
+  highlighted: 'Highlighted'
+  breadcrumbs: 'Breadcrumbs'
+  content: 'Content'
+  sidebar_first: 'Primary'
+  sidebar_second: 'Secondary'
+  footer: 'Footer'

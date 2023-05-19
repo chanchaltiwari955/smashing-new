@@ -1,0 +1,165 @@
+swedd-libraries:
+  version: 1.x
+  css:
+    theme:
+      css/loading.css: {}
+      css/overlay.css: {}
+      css/common.css: {}
+      css/home.css: {}
+      css/custom.css: {}
+  js:
+    js/ie.js: {}
+    js/loading.js: {}
+    js/custom.js: {}
+    
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery
+    - core/jquery.once
+
+latest-news-libraries:
+  version: 1.x
+  js:
+   js/template-news.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
+
+latest-publications-libraries:
+  version: 1.x
+  js:
+   js/publications-template.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
+
+404-pages-libraries:
+  version: 1.x
+  css:
+    theme:
+      css/404-style.css: {}
+
+latest-campaigns-libraries:
+  version: 1.x
+  js:
+   js/campaigns-template.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
+
+latest-events-libraries:
+  version: 1.x
+  js:
+   js/campaigns-template.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
+
+home-libraries:
+  version: 1.x
+  js:
+   js/home.js: {}
+
+about-libraries:
+  version: 1.x
+  js:
+   js/about.js: {}
+
+about-swedd-libraries:
+  version: 1.x
+  js:
+   js/swedd.js: {}
+
+partnership-libraries:
+  version: 1.x
+  js:
+   js/partnership.js: {}
+
+organization-libraries:
+  version: 1.x
+  js:
+   js/organization.js: {}
+
+ourwork-libraries:
+  version: 1.x
+  js:
+   js/ourwork.js: {}
+
+key-results-libraries:
+  version: 1.x
+  js:
+   js/key-results.js: {}
+
+objectives-libraries:
+  version: 1.x
+  js:
+   js/objectives.js: {}
+
+themes-libraries:
+  version: 1.x
+  js:
+   js/themes.js: {}
+
+wherewework-libraries:
+  version: 1.x
+  js:
+   js/wherewework.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once
+
+country-libraries:
+  version: 1.x
+  js:
+   js/country.js: {}
+
+latest-libraries:
+  version: 1.x
+  js:
+   js/latest.js: {}
+
+news-libraries:
+  version: 1.x
+  js:
+   js/latest-news.js: {}
+
+publications-libraries:
+  version: 1.x
+  js:
+   js/latest-publications.js: {}
+
+campaigns-libraries:
+  version: 1.x
+  js:
+   js/latest-campaigns.js: {}
+
+events-libraries:
+  version: 1.x
+  js:
+   js/latest-events.js: {}
+
+multimedias-libraries:
+  version: 1.x
+  js:
+   js/latest-multimedias.js: {}
+
+press-libraries:
+  version: 1.x
+  js:
+   js/latest-press.js: {}
+
+multimedias-template-libraries:
+  version: 1.x
+  js:
+   js/multimedias-template.js: {}
+
+contact-libraries:
+  version: 1.x
+  js:
+   js/contact.js: {}

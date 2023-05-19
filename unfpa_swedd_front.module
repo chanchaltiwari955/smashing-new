@@ -1,0 +1,28 @@
+<?php
+
+/**
+ * Implements hook_ajax_render_alter.
+ */
+function unfpa_swedd_front_ajax_render_alter(array &$data) {
+  if (isset($data[0]['settings']['views']['ajaxViews'])) {
+    foreach ($data[0]['settings']['views']['ajaxViews'] as $key => $value) {
+      if ($value['view_name'] === "campaign" || "news" || "press" || "event" || "multimedia" || "publication" ) {
+        foreach ($data as $key => $command) {
+          if ($command['command'] === 'viewsScrollTop') {
+            unset($data[$key]);
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
+function unfpa_swedd_front_form_alter(&$form, &$form_state, $form_id) {
+  $roles = \Drupal::currentUser()->getRoles();
+  if(in_array('administrator',$roles) && ($form_id == 'node_landing_edit_form' || $form_id == 'node_landing_form')) {
+    $form["field_library"]["#access"] = TRUE;
+  }else{
+    $form["field_library"]["#access"] = FALSE;
+  }
+}

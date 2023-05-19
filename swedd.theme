@@ -1,0 +1,209 @@
+<?php
+
+/**
+ * @file
+ * Various theme logic.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\file\Entity\File;
+use Drupal\Core\Render\Markup;
+
+/**
+ * Define current language id.
+ */
+define('LANGUAGE_ID', \Drupal::languageManager()->getCurrentLanguage()->getId());
+
+/**
+ * Implements hook_preprocess_links__language_block().
+ */
+function swedd_preprocess_links__language_block(&$variables) {
+  foreach ($variables['links'] as $i => $link) {
+    /** @var \Drupal\language\Entity\ConfigurableLanguage $linkLanguage */
+    $linkLanguage = $link['link']['#options']['language'];
+    $variables['links'][$i]['link']["#options"]["attributes"]["class"][0] = "inner-link lang";
+    $variables['links'][$i]['link']['#title'] = strtoupper($linkLanguage->get('id'));
+  }
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function swedd_preprocess_node(&$variables) {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node !== NULL) {
+    if ($node->getType() == 'news') {
+      $variables['#attached']['library'][] = 'swedd/latest-news-libraries';
+    }
+    elseif ($node->getType() == 'publication') {
+      $variables['#attached']['library'][] = 'swedd/latest-publications-libraries';
+    }
+    elseif ($node->getType() == 'campaign') {
+      $variables['#attached']['library'][] = 'swedd/latest-campaigns-libraries';
+    }
+    elseif ($node->getType() == 'multimedia') {
+      $variables['#attached']['library'][] = 'swedd/multimedias-template-libraries';
+    }
+    elseif ($node->getType() == 'event') {
+      $variables['#attached']['library'][] = 'swedd/latest-events-libraries';
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function swedd_preprocess_page(&$variables) {
+  $config = \Drupal::config('unfpa_swedd_front.settings');
+  if (!empty($config)) {
+    $footer_image_file = File::load($config->get('footer_logo')[0]);
+    if ($footer_image_file) {
+      $variables['footer_logos'] = file_create_url($footer_image_file->getFileUri());
+    }
+    $variables['front_url'] = $GLOBALS['base_url'];
+    $variables['footer_description'] = $config->get('footer_description');
+    $variables['footer_facebook_url'] = $config->get('footer_facebook_url');
+    $variables['footer_youtube_url'] = $config->get('footer_youtube_url');
+    $variables['copy_right_text'] = $config->get('copy_right_text');
+  }
+
+  $node = \Drupal::routeMatch()->getParameter('node');
+  global $base_url;
+  $lang_code = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $variables['lang'] = $lang_code;
+  if ($node !== NULL) {
+    $current_path = \Drupal::service('path.current')->getPath();
+    if (!in_array($node->getType(), ['country'])) {
+      if ($node->hasField('field_header_class')) {
+        $variables['header_class'] = $node->field_header_class->value;
+      }
+    }
+    $variables['social_title'] = $node->hasField('field_social_title') ? $node->get('field_social_title')->value:'';
+    $variables['social_sub_title'] = $node->hasField('field_social_sub_title') ? $node->get('field_social_sub_title')->value:'';
+    $variables['current_uri'] = $base_url.$current_path;
+    if ($node->hasField('field_social_image')) {
+      $variables['social_image'] = !is_null($node->field_social_image->entity) ? file_create_url($node->field_social_image->entity->getFileUri()):'';
+    }
+  }
+
+  if ($node !== NULL && $node->getType() == 'landing') {
+    $current_uri = \Drupal::request()->getRequestUri();
+    if (!$node->get('field_library')->isEmpty()) {
+      $variables['#attached']['library'][] = $node->get('field_library')->value;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function swedd_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'views_exposed_form' && $form["#id"] == 'views-exposed-form-search-unfpa-swedd-search') {
+    global $base_url;
+    $themeHandler = \Drupal::service('theme_handler');
+    $themePath = $themeHandler->getTheme($themeHandler->getDefault())->getPath();
+    $form['result-count']['#markup'] = '<div class="notag" id="search-count-ajax"><span>0</span> '. t("found") . '</div>';
+    $form['close-button']['#markup'] = '<img src="' . $base_url . '/' . $themePath . '/assets/img/close-search.svg" alt="Clear Search" class="clear-search">';
+    $form["search_api_fulltext"]["#attributes"]["id"] = 'input-search';
+  }
+  if ($form_id == 'views_exposed_form' && ($form["#id"] == 'views-exposed-form-news-news'
+    || $form["#id"] == 'views-exposed-form-publication-publication'
+    || $form["#id"] == 'views-exposed-form-campaign-campaign'
+    || $form["#id"] == 'views-exposed-form-event-event'
+    || $form["#id"] == 'views-exposed-form-multimedia-multimedia'
+    || $form["#id"] == 'views-exposed-form-press-press'
+    )) {
+    $form['#prefix'] = '<div class="container">';
+    $form['#suffix'] = '</div>';
+    $form["#attributes"]["class"][] = 'filters';
+    $form["combine"]['#prefix'] = Markup::create('<div class="input input-search">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+      <path d="m17.13 16.24-4.72-4.72a6.89 6.89 0 1 0-.89.88l4.72 4.72.89-.88ZM1.5 7.12a5.62 5.62 0 1 1 11.25 0 5.62 5.62 0 0 1-11.25 0Z" />
+    </svg>');
+    $form["combine"]['#suffix'] = '</div>';
+    $form["tid"]['#prefix'] = Markup::create('<div class="select"><div class="select-button">
+      <span class="select-label"></span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
+        <path d="M9.74.27a.9.9 0 0 0-.98-.2.9.9 0 0 0-.29.2L5 3.8 1.52.27a.89.89 0 0 0-1.26 0 .92.92 0 0 0 0 1.28l4.11 4.18a.9.9 0 0 0 .98.2.9.9 0 0 0 .29-.2l4.1-4.18a.93.93 0 0 0 0-1.28Z" />
+      </svg>
+      </div>');
+    $form["tid"]['#suffix'] = '</div>';
+    $form["tid_1"]['#prefix'] = Markup::create('<div class="select"><div class="select-button">
+      <span class="select-label"></span>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 6">
+        <path d="M9.74.27a.9.9 0 0 0-.98-.2.9.9 0 0 0-.29.2L5 3.8 1.52.27a.89.89 0 0 0-1.26 0 .92.92 0 0 0 0 1.28l4.11 4.18a.9.9 0 0 0 .98.2.9.9 0 0 0 .29-.2l4.1-4.18a.93.93 0 0 0 0-1.28Z" />
+      </svg>
+      </div>');
+    $form["tid_1"]['#suffix'] = '</div>';
+    $form["tid"]["#options"]["All"] = t("Topics");
+    $form["tid_1"]["#options"]["All"] = t("Countries");
+  }
+}
+
+/**
+ * Implements template_preprocess_views_view().
+ */
+function swedd_preprocess_views_view(&$variables) {
+  $view = $variables['view'];
+  $id = $view->storage->id();
+  if ($id == 'search' && $view->current_display == 'unfpa_swedd_search') {
+    $variables['search_result'] = count($view->result);
+  }
+}
+
+/**
+ * Implements hook__preprocess_HOOK().
+ */
+function swedd_preprocess_breadcrumb(&$variables) {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  $lang_code = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $variables['language'] = $lang_code;
+  $current_uri = \Drupal::request()->getRequestUri();
+  if ($node !== NULL) {
+    if ($variables['breadcrumb']) {
+      if ($current_uri =='/notre-presence' || in_array($node->getType(), [
+        'event',
+        'multimedia',
+        'campaign',
+        'news',
+        'publication',
+      ])) {
+        $variables['attributes'] = ['class' => 'white'];
+      }
+    }
+  }
+  if ($current_uri =='/contact-us') {
+    unset($variables["breadcrumb"][2]);
+    unset($variables["breadcrumb"][3]);
+    unset($variables["breadcrumb"][4]);
+    unset($variables["breadcrumb"][1]["url"]);
+    $variables["breadcrumb"][1]["text"] = t("Contact us");
+  }
+}
+
+/**
+ * Implements template_preprocess_paragraph().
+ */
+function swedd_preprocess_paragraph(&$variables) {
+  $config = \Drupal::config('unfpa_swedd_front.settings');
+  $variables['footer_facebook_url'] = $config->get('footer_facebook_url');
+  $variables['footer_youtube_url'] = $config->get('footer_youtube_url');
+}
+
+/**
+ * Implements template_preprocess_webform().
+ */
+function swedd_preprocess_webform(&$variables) {
+  $config = \Drupal::config('unfpa_swedd_front.settings');
+  $variables['footer_facebook_url'] = $config->get('footer_facebook_url');
+  $variables['footer_youtube_url'] = $config->get('footer_youtube_url');
+}
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function swedd_preprocess_pager(array &$vars) {
+  $element = $vars['pager']['#element'];
+  $pager_manager = \Drupal::service('pager.manager');
+  $pager = $pager_manager->getPager($element);
+  $vars['pager_max'] = $pager->getTotalPages();
+}

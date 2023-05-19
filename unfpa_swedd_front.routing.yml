@@ -1,0 +1,23 @@
+unfpa_swedd_front.homepage:
+  path: '/admin/unfpa_swedd_site_config/homepage'
+  defaults:
+    _form: '\Drupal\unfpa_swedd_front\Form\FrontConfigForm'
+    _title: 'Homepage Configuration'
+  requirements:
+    _permission: 'administer site configuration'
+
+unfpa_swedd_front.unfpa_swedd_site_config:
+  path: '/admin/unfpa_swedd_site_config'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'UNFPA SWEDD Site Config'
+  requirements:
+    _permission: 'administer site configuration'
+
+unfpa_swedd_front.unfpa_submit_succesfully:
+  path: '/submit-succesfully'
+  defaults:
+    _controller: '\Drupal\unfpa_swedd_front\Controller\UnfpaSubmitSuccesfully::ThankyouPage'
+    _title: ''
+  requirements:
+    _permission: 'access content'

@@ -1,0 +1,11 @@
+unfpa_swedd_front.css_interface:
+  title: 'SWEDD Configuration'
+  description: 'Allows admin user to configure UNFPA SWEDD Settings.'
+  parent: system.admin
+  route_name: unfpa_swedd_front.unfpa_swedd_site_config
+
+unfpa_swedd_front.homepage_configuration:
+  title: 'Homepage Configuration'
+  description: 'UNFPA homepage configuration'
+  parent: unfpa_swedd_front.css_interface
+  route_name: unfpa_swedd_front.homepage
