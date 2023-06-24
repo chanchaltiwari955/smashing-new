@@ -1,0 +1,153 @@
+{#
+/**
+ * @file
+ * Default theme implementation for main view template.
+ *
+ * Available variables:
+ * - attributes: Remaining HTML attributes for the element.
+ * - css_name: A CSS-safe version of the view name.
+ * - css_class: The user-specified classes names, if any.
+ * - header: The optional header.
+ * - footer: The optional footer.
+ * - rows: The results of the view query, if any.
+ * - empty: The content to display if there are no rows.
+ * - pager: The optional pager next/prev links to display.
+ * - exposed: Exposed widget form/info to display.
+ * - feed_icons: Optional feed icons to display.
+ * - more: An optional link to the next page of results.
+ * - title: Title of the view, only used when displaying in the admin preview.
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the view title.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the view title.
+ * - attachment_before: An optional attachment view to be displayed before the
+ *   view content.
+ * - attachment_after: An optional attachment view to be displayed after the
+ *   view content.
+ * - dom_id: Unique id for every view being printed to give unique class for
+ *   JavaScript.
+ *
+ * @see template_preprocess_views_view()
+ *
+ * @ingroup themeable
+ */
+#}
+<div{{attributes.addClass(classes)}}>
+	{{ title_prefix }}
+	{{ title }}
+	{{ title_suffix }}
+
+	{% if header %}
+		<header>
+			{{ header }}
+		</header>
+	{% endif %}
+
+	{{ exposed }}
+	{{ attachment_before }}
+	{% if rows -%}
+    <div class="view-content">
+			{% for key, row in rows[0]['#rows'] %}
+				{% set node_url = path('entity.node.canonical', {'node': row['#row']._entity.id}) %}
+				{% set type = row['#row']._entity.type.entity.label %}
+				{% set node_title = row['#row']._entity.title.entity.label %}
+				{% set link_text = "Read More"|t %}
+        {% set module_path = bamboo_path_system('module', 'unfpa_offices_conferences') %}
+
+				{% if row['#row']._entity.getType() == 'ct_news' or 'ct_resources'or 'ct_video' or 'ct_publications' or 'slideshow' or 'ct_events' %}
+					{% set date = row['#row']._entity.field_date[0].value %}
+				{% endif %}
+
+				{% if row['#row']._entity.getType() == 'ct_news' %}
+					{% set img_url = file_url(row['#row']._entity.field_news_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_resources' %}
+					{% set img_url = file_url(row['#row']._entity.field_resource_cover_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_video' %}
+					{% set img_url = file_url(row['#row']._entity.field_video.entity.fileuri) %}
+				{% elseif row['#row']._entity.getType() == 'ct_publications' %}
+					{% set img_url = file_url(row['#row']._entity.field_publication_cover_image.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'slideshow' %}
+					{% set img_url = file_url(row['#row']._entity.field_slid_homepage_cover_image.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_events' %}
+				{% set img_url = file_url(row['#row']._entity.field_eve_homepage_cover_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_unfpa_representative' %}
+					{% set img_url = file_url(row['#row']._entity.field_profile_picture.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'pledge' %}
+					{% set img_url = file_url(row['#row']._entity.field_pledge_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_topics' %}
+					{% set img_url = file_url(row['#row']._entity.field_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_topic_page' %}
+					{% set img_url = file_url(row['#row']._entity.field_cover_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'conference' %}
+					{% set img_url = file_url(row['#row']._entity.field_hp_desktop_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'program' %}
+					{% set img_url = file_url(row['#row']._entity.field_banner_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'speaker' %}
+					{% set img_url = file_url(row['#row']._entity.field_profile_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_projects' %}
+					{% set img_url = file_url(row['#row']._entity.field_desktop_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'photo_gallery' %}
+					{% set img_url = file_url(row['#row']._entity.field_photo.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ar_country_detail_page' %}
+					{% set img_url = file_url(row['#row']._entity.field_banner_image.entity.uri.value) %}
+				{% elseif row['#row']._entity.getType() == 'ct_story' %}
+					{% set img_url = file_url(row['#row']._entity.field_menengage_banner_image.entity.uri.value) %}
+				{% endif %}
+				{% if img_url is empty %}
+				  {% set img_url = base_url ~ '/' ~ module_path ~ '/images/img-placeholder.gif' %}
+				{% endif %}
+
+				{% set body = row['#row']._entity.field_blurb.value is not empty  ? row['#row']._entity.field_blurb.value : row['#row']._entity.body.value %}
+				{% if type == 'ct_topic_page' %}
+					{% set body =  row['#row']._entity.field_top_content.value|striptags %}
+				{% endif %}	
+				<div class="row list-row">
+					<div class="col-md-4 col-sm-4 col-xs-12">
+						{% if type == ct_video %}
+							<div class="video-holder">
+								{{ content.field_video.0['#url'] }}
+							</div>
+						{% else %}
+							<div class="img-holder">
+								{{ drupal_image("" ~ img_url ~ "") }}
+							</div>
+						{% endif %}
+					</div>
+					<div class="col-md-8 col-sm-8 col-xs-12">
+						<div class="news-content">
+							{% if date or type is not empty  %}
+								<div class="news-content__date-location">
+									<i><img src="{{ base_url ~ '/' ~ module_path ~ '/images/icon-program-orange.svg' }}" alt=""></i>
+									<span class="details">{{ date }}</span>
+								</div>
+								<div class="news-content__date-location">
+									<i><img src="{{ base_url ~ '/' ~ module_path ~ '/images/icon-news-orange.svg' }}" alt=""></i>
+									<span class="details">{{ type }}</span>
+								</div>
+								<h3><a href="{{ node_url }}">{{ node_title }}</a></h3>
+								<p>{{ body|raw }}</p>
+							{% endif %}	
+						</div>
+					</div>
+				</div>
+			{% endfor %}	
+		</div>
+	{% elseif empty -%}
+		<div class="view-empty">
+			{{ empty }}
+		</div>
+	{% endif %}
+
+	{{ pager }}
+
+	{{ attachment_after }}
+	{{ more }}
+
+	{% if footer %}
+		<footer>
+			{{ footer }}
+		</footer>
+	{% endif %}
+
+	{{ feed_icons }}
+</div>

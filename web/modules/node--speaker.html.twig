@@ -1,0 +1,65 @@
+{{ attach_library('unfpa_offices_conferences/conference_speaker_style') }}
+<div class="container-fluid with-half-hero">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="topic-header__content">
+        <ul class="breadcrumb">
+          <li><a href="{{ base_url }}">{{ 'Home'|t }}</a></li>
+          <li><a href="{{ speakers_path }}">{{ 'Speakers'|t }}</a></li>
+          <li>{{ title }}</li>
+        </ul>
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="page-wrapper speakers-wrap">
+              <div class="content-wrapper">
+                <div class="colm-1">
+                  <div class="speaker-profile {{ speaker_class }}">
+                    {% if featured == 0 %}
+                    <div class="img-blk">
+                      {% endif %}
+                      <div class="image">
+                        <img src="{{ banner_image }}" alt="" />
+                      </div>
+                      {% if featured == 0 %}
+                    </div>
+                    {% endif %}
+
+                    <div class="text-cont">
+                      <h1>{{ title|raw }}</h1>
+                      <h3>{{ body|raw }}</h3>
+                      <p></p>
+                    </div>
+                  </div>
+
+                  <div class="go-back-wrapper">
+                    <a href=" {{ speakers_path }}">
+                      <div class="btn-back"><img src="{{ module_path }}/images/icon-btn-arrow-up.svg" alt="go top" /></div>
+                    </a>
+                    <div class="toptext">{{ 'Back to Speakers Page'|t }}</div>
+                  </div>
+                </div>
+                <div class="colm-2">
+                  <div class="share-wrapper">
+                    <div class="inr-blk">
+                      <div class="btn-share-wrap">
+                        <div class="btn-share"><img src="{{ module_path }}/images/icon-share-orang.svg" alt="share" /></div>
+                        <div class="sharetext">{{ 'Share'|t }}</div>
+                      </div>
+
+                      <div class="top-wrapper">
+                        <div class="btn-up"><img src="{{ module_path }}/images/icon-btn-arrow-up.svg" alt="go top" /></div>
+                        <div class="toptext">{{ 'Go to top'|t }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

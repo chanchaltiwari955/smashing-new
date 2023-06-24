@@ -1,0 +1,1202 @@
+<?php
+
+/**
+ * @file
+ * Contains unfpa_offices_conferences.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
+use Drupal\node\Entity\Node;
+use Drupal\file\Entity\File;
+use Drupal\paragraphs\Entity\Paragraph;
+use Drupal\views\Views;
+
+/**
+ * Implements hook_theme()
+ */
+function unfpa_offices_conferences_theme($existing, $type, $theme, $path) {
+  $path = \Drupal::service('module_handler')->getModule('unfpa_offices_conferences')->getPath();
+  return [
+    'conferences_programme' => [
+      'template' => 'conferences-programme',
+      'variables' => [
+        'data' => NULL,
+      ],
+    ],
+
+    'conferences_speakers' => [
+      'template' => 'conferences-speakers',
+      'variables' => [
+        'data' => NULL,
+      ],
+    ],
+
+    'conferences_news' => [
+      'template' => 'conferences-news',
+      'variables' => [
+        'module_path' => NULL,
+        'data' => NULL,
+      ],
+      'path' => $path . '/templates',
+    ],
+
+    'conferences_detail' => [
+      'template' => 'conferences-detail',
+      'variables' => [
+        'module_path' => NULL,
+        'data' => NULL,
+      ],
+    ],
+
+    'conferences_resources' => [
+      'template' => 'conferences-resources',
+      'variables' => [
+        'data' => NULL,
+      ],
+    ],
+
+    'page__conference' => [
+      'render element' => 'content',
+      'base hook' => 'page',
+      'template' => 'page/page--conference',
+    ],
+
+    'page__speaker' => [
+      'render element' => 'content',
+      'base hook' => 'page',
+      'template' => 'page/page--speaker',
+    ],
+
+    'page__program' => [
+      'render element' => 'content',
+      'base hook' => 'page',
+      'template' => 'page/page--program',
+    ],
+
+    'node__conference' => [
+      'render element' => 'content',
+      'base hook' => 'node',
+      'template' => 'node/node--conference',
+    ],
+
+    'node__program' => [
+      'render element' => 'content',
+      'base hook' => 'node',
+      'template' => 'node/node--program',
+    ],
+
+    'node__speaker' => [
+      'render element' => 'content',
+      'base hook' => 'node',
+      'template' => 'node/node--speaker',
+    ],
+
+    'views_view__unfpa_offices_conferences__grid_news' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view--unfpa-offices-conferences--grid-news',
+    ],
+
+    'views_view__unfpa_offices_conferences__list_news' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => [NULL]],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view--unfpa-offices-conferences--list-news',
+    ],
+
+    'views_view__unfpa_offices_conferences__program_list' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view--unfpa-offices-conferences--program-list',
+    ],
+
+    'views_view__unfpa_offices_conferences__related_content' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'template' => 'views-view--unfpa-offices-conferences--related-content',
+      'path' => $path . '/templates/views',
+    ],
+
+    'views_view__unfpa_offices_conferences__resource_documents' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view--unfpa-offices-conferences--resource-documents',
+    ],
+
+    'views_view__unfpa_offices_conferences__speaker_attachment' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view--unfpa-offices-conferences--speaker-attachment',
+    ],
+
+    'views_view__unfpa_offices_conferences__speaker_list' => [
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view--unfpa-offices-conferences--speaker-list',
+    ],
+
+    'views_view_field__unfpa_offices_conferences__grid_news__view_node' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view-field--unfpa-offices-conferences--grid-news--view-node',
+    ],
+
+    'views_view_field__unfpa_offices_conferences__list_news__view_node' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view-field--unfpa-offices-conferences--list-news--view-node',
+    ],
+
+    'views_view_field__unfpa_offices_conferences__related_content__view_node' => [
+      'arguments' => ['view' => NULL, 'options' => NULL, 'row' => NULL],
+      'base hook' => 'views_view_fields',
+      'path' => $path . '/templates/views',
+      'template' => 'views-view-field--unfpa-offices-conferences--related-content--view-node',
+    ],
+  ];
+}
+
+/**
+ * Implementation of hook_preprocess_page().
+ *
+ * Override or insert variables into page template.
+ */
+function unfpa_offices_conferences_preprocess_page(&$variables) {
+  $variables['menu_name'] = $variables['menu_redirect_url'] = '';
+  global $base_url;
+  $negotiator = \Drupal::service('domain.negotiator');
+  $domain = $negotiator->getActiveDomain();
+  if (!empty($domain)) {
+    $domain_id = $domain->id();
+  }
+  $language_name = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $lan = \Drupal::service('language_manager')->getStandardLanguageList();
+  $variables['home_page'] = !empty(\Drupal::state()->get($domain_id . '_home_page')) ? \Drupal::state()->get($domain_id . '_home_page') : '';
+  $variables['current_page'] = \Drupal::routeMatch()->getRouteName();
+  $current_path = \Drupal::service('path.current')->getPath();
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node instanceof NodeInterface) {
+    $conferences_path = '/conferences/' . $node->id() . '/programme';
+    $speakers_path = '/conferences/' . $node->id() . '/speakers';
+    $news_path = '/conferences/' . $node->id() . '/news';
+    $resources_path = '/conferences/' . $node->id() . '/resources';
+    $variables['logo_color'] = !empty($node->hasField('field_logo_color')) ? $node->get('field_logo_color')->value : '';
+    if ($node->getType() == 'conference' &&
+      (in_array($current_path, [$conferences_path, $speakers_path, $news_path, $resources_path]) ||
+        strpos($current_path, '/conferences/' . $node->id() . '/listing/') !== FALSE ||
+        strpos($current_path, '/conferences/' . $node->id() . '/detail/') !== FALSE)
+    ) {
+      $share_details = [];
+      $variables['module_path'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('unfpa_offices_conferences');
+      $variables['module_path_conference'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('node');
+      $variables['theme_hook_suggestions'][] = 'conference_page';
+      if ($current_path == $conferences_path) {
+        $share_details['share_url'] = $base_url . '/' . $language_name . $conferences_path;
+      }
+      elseif ($current_path == $speakers_path) {
+        $share_details['share_url'] = $base_url . '/' . $language_name . $speakers_path;
+      }
+      elseif ($current_path == $news_path) {
+        $share_details['share_url'] = $base_url . '/' . $language_name . $news_path;
+      }
+      elseif ($current_path == $resources_path) {
+        $share_details['share_url'] = $base_url . '/' . $language_name . $resources_path;
+      }
+      $variables['banner_switcher'] = !$node->get('field_banner_switcher')->isEmpty() ? $node->get('field_banner_switcher')->getValue()[0]['value'] : '';
+      if ($variables['banner_switcher'] == 'full_page' || $variables['banner_switcher'] == 'full_page_without_effect') {
+        $variables['desktop_image'] = !$node->get('field_desktop_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !$node->get('field_ipad_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !$node->get('field_mobile_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_mobile_image')->entity->getFileUri()) : '';
+      }
+      else {
+        $variables['desktop_image'] = !empty($node->field_hp_desktop_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_hp_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !empty($node->field_hp_ipad_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_hp_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !empty($node->field_hp_mobile_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_hp_mobile_image')->entity->getFileUri()) : '';
+      }
+      $variables['title'] = $node->label();
+      $variables['sub_title'] = !empty($node->hasField('field_sub_title')) ? $node->get('field_sub_title')->getValue() : '';
+      $variables['related_content_title'] = !$node->get('field_related_content_title')->isEmpty() ? $node->get('field_related_content_title')->getValue() : t('Related Content');
+      $variables['banner_title'] = !$node->get('field_sub_title_on_image')->isEmpty() ? $node->get('field_sub_title_on_image')->getValue()[0]['value'] : '';
+      $variables['date'] = !$node->get('field_date')->isEmpty() ? date('d F, Y', strtotime($node->get('field_date')->value)) : '';
+      $variables['end_date'] = !$node->get('field_end_date')->isEmpty() ? date('d F, Y', strtotime($node->get('field_end_date')->value)) : '';
+      $variables['location'] = !$node->get('field_location')->isEmpty() ? $node->get('field_location')->getValue()[0]['value'] : '';
+      $variables['external_link'] = !$node->get('field_new_external_link')->isEmpty() ? $node->get('field_new_external_link')->uri : '';
+      $variables['external_link_title'] = !$node->get('field_new_external_link')->isEmpty() ? $node->get('field_new_external_link')->getValue()[0]['title'] : '';
+      $variables['body'] = !$node->get('body')->isEmpty() ? $node->get('body')->getValue() : '';
+      $menu_details_nid = $node->get('field_menu_details')->getValue();
+      $menu_details = [];
+      foreach ($menu_details_nid as $menu_value) {
+        $wrapper = Paragraph::load($menu_value['target_id']);
+        $field_id = $wrapper->get('field_icon')->getValue();
+        foreach ($field_id as $value) {
+          $menu_icon = "";
+          if (isset($value['target_id'])) {
+            $fid = $value["target_id"];
+            $icon_id = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+            $menu_icon = \Drupal::service('file_url_generator')->generateAbsoluteString($icon_id->getFileUri());
+          }
+        }
+        if ($wrapper->hasField('field_icon_url')) {
+          $icon_url = $wrapper->get('field_icon_url')->uri;
+        }
+        $page_type = $wrapper->get('field_page_type')->value;
+        $display_title = $wrapper->get('field_menu_display_name')->value;
+        if (!empty($display_title)) {
+          $menu_details[$menu_value['target_id']]['display_name'] = $wrapper->get('field_menu_display_name')->value;
+          $menu_details[$menu_value['target_id']]['menu_url'] = !empty($menu_icon) ? $menu_icon : '';
+          $page_title_type = !empty($wrapper->hasField('field_icon_title')) ? $wrapper->get('field_icon_title')->value : '';
+          if ($language_name == 'en') {
+            $url_lang = "";
+          }
+          else {
+            $url_lang = "/" . $language_name;
+          }
+          if ($page_type == 'select_if_listing_page') {
+            $title_slug = \Drupal::service('pathauto.alias_cleaner')->cleanString($display_title);
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/' . 'conferences/' . $node->id() . '/listing/' . $title_slug;
+            if (strpos($menu_details[$menu_value['target_id']]['menu_redirect_url'], $current_path) !== FALSE) {
+              $variables['menu_name'] = $display_title;
+              // $lang_switcher = _get_language_switcher_links($node->id(), 'listing', $k);
+            }
+          }
+          elseif ($page_type == 'select_if_description') {
+            $title_slug = \Drupal::service('pathauto.alias_cleaner')->cleanString($display_title);
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/' . 'conferences/' . $node->id() . '/detail/' . $title_slug;
+            if (strpos($menu_details[$menu_value['target_id']]['menu_redirect_url'], $current_path) !== FALSE) {
+              $variables['menu_name'] = $display_title;
+              // $lang_switcher = _get_language_switcher_links($node->id(), 'detail', $k);
+            }
+          }
+          else {
+            if ($page_title_type == 'About') {
+              $aliasManager = \Drupal::service('path_alias.manager');
+              $path_alias = $base_url . $url_lang . $aliasManager->getAliasByPath('/node/' . $node->id(), $language_name);
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $path_alias;
+            }
+            if ($page_title_type == 'Programme') {
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . $conferences_path;
+            }
+            if ($page_title_type == 'Speakers') {
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . $speakers_path;
+            }
+            if ($page_title_type == 'Resources') {
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/' . $resources_path;
+            }
+            if ($page_title_type == 'News') {
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/' . $news_path;
+            }
+          }
+
+          if (!empty($icon_url['url'])) {
+            $menu_details[$menu_value['target_id']]['icon_url'] = $icon_url['url'];
+          }
+
+          if ($current_path == $conferences_path) {
+            if ($page_title_type == 'Programme') {
+              $variables['menu_name'] = $wrapper->get('field_menu_display_name')->value;
+              // $lang_switcher = _get_language_switcher_links($node->id(), 'programme');
+            }
+          }
+          elseif ($current_path == $speakers_path) {
+            if ($page_title_type == 'Speakers') {
+              $variables['menu_name'] = $wrapper->get('field_menu_display_name')->value;
+              // $lang_switcher = _get_language_switcher_links($node->id(), 'speakers');
+            }
+          }
+          elseif ($current_path == $news_path) {
+            if ($page_title_type == 'News') {
+              $variables['menu_name'] = $wrapper->get('field_menu_display_name')->value;
+              // $lang_switcher = _get_language_switcher_links($node->id(), 'news');
+            }
+          }
+          elseif ($current_path == $resources_path) {
+            if ($page_title_type == 'Resources') {
+              $variables['menu_name'] = $wrapper->get('field_menu_display_name')->value;
+              // $lang_switcher = _get_language_switcher_links($node->id(), 'resources');
+            }
+          }
+        }
+      }
+      if (count($lan) == 1) {
+        $variables['language_switcher'] = '';
+      }
+      else {
+        $variables['language_switcher'] = $lang_switcher;
+      }
+
+      $variables['menu_details'] = $menu_details;
+
+      // Questions and Answers.
+      $variables['about_summary'] = !$node->get('field_about_summary')->isEmpty() ? $node->get('field_about_summary')->value : '';
+      $variables['about_details'] = !$node->get('field_about_details')->isEmpty() ? $node->get('field_about_details')->value : '';
+      $variables['conferences_related_content'] = views_embed_view('unfpa_offices_conferences', 'related_content');
+      $footer_details = !empty($node->hasField('field_footer_details')) ? $node->get('field_footer_details')->getValue() : '';
+      $footer_banner_details = [];
+      foreach ($footer_details as $value) {
+        $footer_banner_wrapper = Paragraph::load($value['target_id']);
+        $footer_banner = !$footer_banner_wrapper->get('field_footer_banner')->isEmpty() ? $footer_banner_wrapper->get('field_footer_banner')->value : '';
+        $footer_banner_details['type'] = !$footer_banner_wrapper->get('field_type')->isEmpty() ? $footer_banner_wrapper->get('field_type')->value : '';
+        $footer_banner_details['footer_banner_title'] = !$footer_banner_wrapper->get('field_footer_banner_title')->isEmpty() ? $footer_banner_wrapper->get('field_footer_banner_title')->gvalue : '';
+        $footer_banner_details['banner'] = !empty($footer_banner) ? \Drupal::service('file_url_generator')->generateAbsoluteString($footer_banner['uri']) : '';
+        $partner_logo = $footer_banner_wrapper->get('field_partner_logo')->getValue();
+        if (is_array($partner_logo) && count($partner_logo) > 0) {
+          foreach ($partner_logo as $key => $val) {
+            $footer_banner_details['ptl'][$key]['logo'] = !empty($val->field_logo) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->field_logo->entity->getFileUri()) : '';
+            $footer_banner_details['ptl'][$key]['logo_url'] = !empty($val->field_logo_url) ? $val->get('field_logo_url')->getValue()[0]['url'] : '';
+          }
+        }
+      }
+      $variables['footer_banner_details'] = $footer_banner_details;
+      $variables['share_image'] = !empty($node->field_share_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->field_share_image->entity->getFileUri()) : '';
+      $variables['share_description'] = !$node->get('field_share_description')->isEmpty() ? $node->get('field_share_description')->value : '';
+
+      $share_details['url'] = $share_details['share_url'];
+      $share_details['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $share_details['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $share_details['share_title'] = $node->label();
+
+      $variables['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $variables['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $variables['share_title'] = $node->label();
+
+      $meta_tag_list = unfpa_offices_conferences_share_details($share_details);
+      $variables['related_content_display'] = 'no';
+    }
+    elseif ($node->getType() == 'speaker') {
+      $variables['theme_hook_suggestions'][] = 'speaker_page';
+      $variables['module_path'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('unfpa_offices_conferences');
+
+      $entity_storage = \Drupal::entityTypeManager()->getStorage('node');
+      $result = $entity_storage->getQuery()
+        ->condition('type', 'conference')
+        ->range(0, 1)
+        ->execute();
+
+      $conference_nid = array_values($result);
+      $conference_nid = $conference_nid[0];
+      $conference_node_default = Node::load($conference_nid);
+      if ($conference_node_default->hasTranslation($language_name)) {
+        $conference_node = $conference_node_default->getTranslation($language_name);
+      }
+      else {
+        $conference_node = $conference_node_default;
+      }
+      $variables['banner_switcher'] = !empty($conference_node->field_banner_switcher) ? $conference_node->get('field_banner_switcher')->getValue() : '';
+      if ($variables['banner_switcher'] == 'full_page' || $variables['banner_switcher'] == 'full_page_without_effect') {
+        $variables['desktop_image'] = !$conference_node->get('field_desktop_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !$conference_node->get('field_ipad_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !$conference_node->get('field_mobile_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_mobile_image')->entity->getFileUri()) : '';
+      }
+      else {
+        $variables['desktop_image'] = !empty($conference_node->field_hp_desktop_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_hp_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !empty($conference_node->field_hp_ipad_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_hp_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !empty($conference_node->field_hp_mobile_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_hp_mobile_image')->entity->getFileUri()) : '';
+      }
+      $footer_details = !empty($node->hasField('field_footer_details')) ? $node->get('field_footer_details')->getValue() : '';
+      $footer_banner_details = [];
+      foreach ($footer_details as $value) {
+        $footer_banner_wrapper = Paragraph::load($value['target_id']);
+        $footer_banner = $footer_banner_wrapper->field_footer_banner->value();
+        $footer_banner_details['type'] = !$footer_banner_wrapper->get('field_type')->isEmpty() ? $footer_banner_wrapper->field_type->value() : '';
+        $footer_banner_details['footer_banner_title'] = !$footer_banner_wrapper->get('field_footer_banner_title')->isEmpty() ? $footer_banner_wrapper->field_footer_banner_title->value() : '';
+        $footer_banner_details['banner'] = !empty($footer_banner) ? \Drupal::service('file_url_generator')->generateAbsoluteString($footer_banner['uri']) : '';
+        $partner_logo = $footer_banner_wrapper->field_partner_logo->value();
+        if (is_array($partner_logo) && count($partner_logo) > 0) {
+          foreach ($partner_logo as $key => $val) {
+            $footer_banner_details['ptl'][$key]['logo'] = !empty($val->field_logo) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_logo')->entity->getFileUri()) : '';
+            $footer_banner_details['ptl'][$key]['logo_url'] = !empty($val->field_logo_url) ? $val->get('field_logo_url')->entity->getFileUri() : '';
+          }
+        }
+      }
+      $variables['footer_banner_details'] = $footer_banner_details;
+      $variables['share_image'] = !empty($conference_node->field_share_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_share_image')->entity->getFileUri()) : '';
+      $variables['share_description'] = !$conference_node->get('field_share_description')->isEmpty() ? $conference_node->get('field_share_description')->value : '';
+      $share_details = [];
+      $share_details['url'] = \Drupal::service('path_alias.manager')->getAliasByPath("/node/" . $node->id(), $language_name);
+      $share_details['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $share_details['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $share_details['share_title'] = $node->label();
+      $variables['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $variables['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $variables['share_title'] = $node->label();
+      $meta_tag_list = unfpa_offices_conferences_share_details($share_details);
+    }
+    elseif ($node->getType() == 'program') {
+      $variables['theme_hook_suggestions'][] = 'program_page';
+      $variables['module_path'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('unfpa_offices_conferences');
+      $entity_storage = \Drupal::entityTypeManager()->getStorage('node');
+      $query = $entity_storage->getQuery();
+      $query->condition('type', 'conference');
+      $query->range(0, 1);
+      $result = $query->execute();
+      $conference_nid = array_values($result);
+      $conference_nid = $conference_nid[0];
+      $conference_node_default = Node::load($conference_nid);
+      if ($conference_node_default->hasTranslation($language_name)) {
+        $conference_node = $conference_node_default->getTranslation($language_name);
+      }
+      else {
+        $conference_node = $conference_node_default;
+      }
+      $variables['banner_switcher'] = !empty($conference_node->field_banner_switcher) ? $conference_node->get('field_banner_switcher')->getValue() : '';
+      if ($variables['banner_switcher'] == 'full_page' || $variables['banner_switcher'] == 'full_page_without_effect') {
+        $variables['desktop_image'] = !empty($conference_node->field_desktop_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !empty($conference_node->field_ipad_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !empty($conference_node->field_mobile_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_mobile_image')->entity->getFileUri()) : '';
+      }
+      else {
+        $variables['desktop_image'] = !empty($conference_node->field_hp_desktop_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_hp_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !empty($conference_node->field_hp_ipad_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_hp_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !empty($conference_node->field_hp_mobile_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_hp_mobile_image')->entity->getFileUri()) : '';
+      }
+      $footer_details = !empty($node->hasField('field_footer_details')) ? $node->get('field_footer_details')->getValue() : '';
+      $footer_banner_details = [];
+      if (!empty($footer_details)) {
+        foreach ($footer_details as $value) {
+          $footer_banner_wrapper = Paragraph::load($value['target_id']);
+          $footer_banner = $footer_banner_wrapper->get('field_footer_banner')->value;
+          $footer_banner_details['type'] = !$footer_banner_wrapper->get('field_type')->isEmpty() ? $footer_banner_wrapper->field_type->value() : '';
+          $footer_banner_details['footer_banner_title'] = $footer_banner_wrapper->field_footer_banner_title->value();
+          $footer_banner_details['banner'] = !empty($footer_banner) ? \Drupal::service('file_url_generator')->generateAbsoluteString($footer_banner['uri']) : '';
+          $partner_logo = $footer_banner_wrapper->get('field_partner_logo')->value;
+          if (is_array($partner_logo) && count($partner_logo) > 0) {
+            foreach ($partner_logo as $key => $val) {
+              $footer_banner_details['ptl'][$key]['logo'] = !empty($val->field_logo) ? \Drupal::service('file_url_generator')->generateAbsoluteString($val->get('field_logo')->entity->getFileUri()) : '';
+              $footer_banner_details['ptl'][$key]['logo_url'] = !empty($val->field_logo_url) ? $val->get('field_logo_url')->entity->getFileUri() : '';
+            }
+          }
+        }
+      }
+
+      $variables['footer_banner_details'] = $footer_banner_details;
+      $menu_details_nid = !empty($node->hasField('field_menu_details')) ? $node->get('field_menu_details')->getValue() : '';
+      $menu_details = [];
+      foreach ($menu_details_nid as $menu_value) {
+        $wrapper = Paragraph::load($menu_value['target_id']);
+        $field_id = $wrapper->get('field_icon')->getValue();
+        if (!empty($field_id)) {
+          foreach ($field_id as $value) {
+            $fid = $value["target_id"];
+            $icon_id = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+            $menu_icon = \Drupal::service('file_url_generator')->generateAbsoluteString($icon_id->getFileUri());
+          }
+        }
+
+        $title = $wrapper->field_icon_title ? $wrapper->get('field_icon_title')->getValue() : '';
+        $icon_url = $wrapper->get('field_icon_url')->uri;
+        if (!empty($title)) {
+          $menu_details[$menu_value['target_id']]['display_name'] = $wrapper->get('field_menu_display_name')->getValue();
+          $menu_details[$menu_value['target_id']]['title'] = $wrapper->get('field_icon_title')->getValue();
+          $menu_details[$menu_value['target_id']]['menu_url'] = !empty($menu_icon) ? $menu_icon : '';
+          if ($title == 'About') {
+            $path_alias = $base_url . '/' . $language_name . '/' . \Drupal::service('path.current')->getPath();
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $path_alias;
+          }
+          if ($title == 'Programme') {
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . '/' . $language_name . '/conferences/' . $conference_node->nid . '/programme';
+          }
+          if ($title == 'Speakers') {
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . '/' . $language_name . '/conferences/' . $conference_node->nid . '/speakers';
+          }
+          if ($title == 'News') {
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . '/' . $language_name . '/conferences/' . $conference_node->nid . '/news';
+          }
+          if ($title == 'Resources') {
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . '/' . $language_name . '/conferences/' . $conference_node->nid . '/resources';
+          }
+          if (!empty($icon_url['url'])) {
+            $menu_details[$menu_value['target_id']]['icon_url'] = $icon_url['url'];
+          }
+          if ($current_path == $conferences_path) {
+            if ($title == 'Programme') {
+              $variables['menu_name'] = $wrapper->get('field_icon_title')->value;
+            }
+          }
+          elseif ($current_path == $speakers_path) {
+            if ($title == 'Speakers') {
+              $variables['menu_name'] = $wrapper->get('field_icon_title')->value;
+            }
+          }
+          elseif ($current_path == $news_path) {
+            if ($title == 'News') {
+              $variables['menu_name'] = $wrapper->get('field_icon_title')->value;
+            }
+          }
+          elseif ($current_path == $resources_path) {
+            if ($title == 'Resources') {
+              $variables['menu_name'] = $wrapper->get('field_icon_title')->value;
+            }
+          }
+        }
+      }
+      $variables['menu_details'] = $menu_details;
+      $variables['share_image'] = !empty($conference_node->field_share_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($conference_node->get('field_share_image')->entity->getFileUri()) : '';
+      $variables['share_description'] = !empty($conference_node->field_share_description->entity) ? $conference_node->get('field_share_description')->value : '';
+      $share_details = [];
+      $share_details['url'] = \Drupal::service('path.current')->getPath();
+      $share_details['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $share_details['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $share_details['share_title'] = $node->label();
+      $variables['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $variables['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $variables['share_title'] = $node->label();
+      $meta_tag_list = unfpa_offices_conferences_share_details($share_details);
+    }
+  }
+  if (isset($variables['node']) && is_object($variables['node'])
+    && (!in_array($current_path, [$conferences_path, $speakers_path, $news_path, $resources_path])
+    && strpos($current_path, '/conferences/' . $node->id() . '/listing/') === FALSE
+    && strpos($current_path, '/conferences/' . $node->id() . '/detail/') === FALSE)) {
+    $node = $variables['node'];
+    if ($node->getType() == 'conference') {
+      $variables['module_path'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('unfpa_offices_conferences');
+      $variables['module_path_conference'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('node');
+      $variables['theme_hook_suggestions'][] = 'conference_page';
+      $variables['banner_switcher'] = !empty($node->field_banner_switcher) ? $node->get('field_banner_switcher')->value : '';
+      if ($variables['banner_switcher'] == 'full_page' || $variables['banner_switcher'] == 'full_page_without_effect') {
+        $variables['desktop_image'] = !$node->get('field_desktop_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !$node->get('field_ipad_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !$node->get('field_mobile_image')->isEmpty() ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_mobile_image')->entity->getFileUri()) : '';
+      }
+      else {
+        $variables['desktop_image'] = !empty($node->field_hp_desktop_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_hp_desktop_image')->entity->getFileUri()) : '';
+        $variables['ipad_image'] = !empty($node->field_hp_ipad_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_hp_ipad_image')->entity->getFileUri()) : '';
+        $variables['mobile_image'] = !empty($node->field_hp_mobile_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->get('field_hp_mobile_image')->entity->getFileUri()) : '';
+      }
+      $variables['title'] = $node->label();
+      $variables['sub_title'] = !empty($node->hasField('field_sub_title')) ? $node->get('field_sub_title')->value : '';
+      $variables['related_content_title'] = !empty($node->field_related_content_title) ? $node->get('field_related_content_title')->value : t('Related Content');
+      $variables['banner_title'] = !empty($node->field_sub_title_on_image) ? $node->get('field_sub_title_on_image')->value : '';
+      $variables['date'] = isset($node->field_date->value) ? \Drupal::service('date.formatter')->format(strtotime($node->field_date->value), 'custom', 'd/m/y') : '';
+      $variables['end_date'] = isset($node->field_end_date->value) ? \Drupal::service('date.formatter')->format(strtotime($node->field_end_date->value), 'custom', 'd/m/y') : '';
+      $variables['location'] = !empty($node->field_location->value) ? $node->get('field_location')->value : '';
+      $variables['external_link'] = !empty($node->field_new_external_link) ? $node->get('field_new_external_link')->uri : '';
+      $variables['external_link_title'] = !$node->get('field_new_external_link')->isEmpty() ? $node->get('field_new_external_link')->getValue()[0]['title'] : '';
+      $variables['body'] = !$node->get('body')->isEmpty() ? $node->get('body')->value : '';
+      $menu_details_nid = $node->get('field_menu_details')->getValue();
+      $menu_details = [];
+      foreach ($menu_details_nid as $menu_value) {
+        $wrapper = Paragraph::load($menu_value['target_id']);
+        $field_id = $wrapper->get('field_icon')->getValue();
+        foreach ($field_id as $value) {
+          $icon_id = '';
+          if (isset($value["target_id"])) {
+            $fid = $value["target_id"];
+            $icon_id = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+          }
+          $menu_icon = !empty($icon_id) ? \Drupal::service('file_url_generator')->generateAbsoluteString($icon_id->getFileUri()) : '';
+        }
+        if (!empty($wrapper->get('field_menu_display_name')->getValue())) {
+          $menu_details[$menu_value['target_id']]['display_name'] = !empty($wrapper->field_menu_display_name) ? $wrapper->get('field_menu_display_name')->getValue()[0]['value'] : '';
+          $menu_details[$menu_value['target_id']]['menu_url'] = !empty($menu_icon) ? $menu_icon : '';
+          $icon_url = $wrapper->get('field_icon_url')->uri;
+          $page_type = $wrapper->get('field_page_type')->value;
+          $display_title = $wrapper->get('field_menu_display_name')->value;
+          if ($language_name == 'en') {
+            $url_lang = "";
+          }
+          else {
+            $url_lang = "/" . $language_name;
+          }
+          if ($page_type == 'select_if_listing_page') {
+            $title_slug = \Drupal::service('pathauto.alias_cleaner')->cleanString($display_title);
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/' . 'conferences/' . $node->id() . '/listing/' . $title_slug;
+          }
+          elseif ($page_type == 'select_if_description') {
+            $title_slug = \Drupal::service('pathauto.alias_cleaner')->cleanString($display_title);
+            $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/' . 'conferences/' . $node->id() . '/detail/' . $title_slug;
+          }
+          else {
+            $page_title_type = !$wrapper->get('field_icon_title')->isEmpty() ? $wrapper->get('field_icon_title')->getValue()[0]['value'] : '';
+            if ($page_title_type == 'About') {
+              $variables['menu_name'] = $wrapper->get('field_menu_display_name')->value;
+              $aliasManager = \Drupal::service('path_alias.manager');
+              $path_alias = $base_url . '/' . $language_name . $aliasManager->getAliasByPath('/node/' . $node->id(), $language_name);
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $path_alias;
+              // $lang_switcher = _get_language_switcher_links($node->id(), 'about');
+              if (($language_name) == 1) {
+                $variables['language_switcher'] = '';
+              }
+              else {
+                $variables['language_switcher'] = $lang_switcher;
+              }
+            }
+            if ($page_title_type == 'Programme') {
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/conferences/' . $node->id() . '/programme';
+            }
+            if ($page_title_type == 'Speakers') {
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/conferences/' . $node->id() . '/speakers';
+            }
+            if ($page_title_type == 'Resources') {
+              $menu_details[$menu_value['target_id']]['menu_redirect_url'] = $base_url . $url_lang . '/conferences/' . $node->id() . '/resources';
+            }
+          }
+
+          if (!empty($icon_url)) {
+            $menu_details[$menu_value['target_id']]['icon_url'] = $icon_url;
+          }
+        }
+      }
+      $variables['menu_details'] = $menu_details;
+      // Questions and Answers.
+      $variables['about_summary'] = !empty($node->field_about_summary) ? $node->get('field_about_summary')->getValue()[0]['value'] : '';
+      $variables['about_details'] = !empty($node->field_about_details) ? $node->get('field_about_details')->value : '';
+      $variables['conferences_related_content'] = views_embed_view('unfpa_offices_conferences', 'related_content');
+      $view = Views::getView('unfpa_offices_conferences');
+      $variables['conferences_related_content_count'] = !empty($view->result) ? count($view->result) : 0;
+      $footer_details = !empty($node->hasField('field_footer_details')) ? $node->get('field_footer_details')->getValue() : '';
+      $footer_banner_details = [];
+      foreach ($footer_details as $value) {
+        $footer_banner_wrapper = Paragraph::load($value['target_id']);
+        $footer_banner = $footer_banner_wrapper->get('field_footer_banner')->getValue();
+        $footer_banner_details['type'] = !$footer_banner_wrapper->get('field_type')->isEmpty() ? $footer_banner_wrapper->get('field_type')->getValue()[0]['value'] : '';
+        $footer_banner_details['footer_banner_title'] = !$footer_banner_wrapper->get('field_footer_banner_title')->isEmpty() ? $footer_banner_wrapper->get('field_footer_banner_title')->value : '';
+        $footer_banner_details['banner'] = !empty($footer_banner->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->footer_banner->entity->getFileUri()) : '';
+        $partner_logo = $footer_banner_wrapper->get('field_partner_logo')->getValue();
+        if (is_array($partner_logo) && count($partner_logo) > 0) {
+          foreach ($partner_logo as $key => $val) {
+            $footer_banner_details['ptl'][$key]['logo'] = !empty($val->field_logo->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->field_logo->entity->getFileUri()) : '';
+            $footer_banner_details['ptl'][$key]['logo_url'] = !empty($val->field_logo_url->entity) ? $val->get('field_logo_url')->entity->getFileUri() : '';
+          }
+        }
+      }
+      $variables['footer_banner_details'] = $footer_banner_details;
+      $variables['share_image'] = !empty($node->field_share_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->field_share_image->entity->getFileUri()) : '';
+      $variables['share_description'] = !empty($node->field_share_description) ? $node->get('field_share_description')->getValue()[0]['value'] : '';
+      $share_details = [];
+      $share_details['url'] = \Drupal::service('path.current')->getPath();
+      $share_details['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $share_details['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $share_details['share_title'] = $node->label();
+
+      $variables['share_image'] = !empty($variables['share_image']) ? $variables['share_image'] : $variables['desktop_image'];
+      $variables['share_description'] = !empty($variables['share_description']) ? $variables['share_description'] : $variables['body'];
+      $variables['share_title'] = $node->label();
+      $meta_tag_list = unfpa_offices_conferences_share_details($share_details);
+      $variables['related_content_display'] = 'yes';
+    }
+  }
+  // }
+  if (!empty($meta_tag_list)) {
+    foreach ($meta_tag_list as $key => $value) {
+      $variables['#attached']['html_head'][] = [$value, 'keywords' . $key];
+    }
+  }
+}
+
+/**
+ * {@inheritdoc}
+ */
+function _get_language_switcher_links($nid, $type, $k = 0) {
+  $enabled_lang = \Drupal::service('language_manager')->getStandardLanguageList();
+  $language_name = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  if (in_array($type, ['speakers', 'programme', 'resources', 'news', 'detail', 'listing'])) {
+    $active = '';
+    $trans_exist = unfpa_offices_check_translation_exist($nid);
+    $links = '<ul class="language-switcher-locale-url">';
+    foreach ($trans_exist as $key => $value) {
+      $active = $key == $language_name ? 'active' : '';
+      switch ($type) {
+        case 'detail':
+        case 'listing':
+          $tnode = $trans_exist;
+          $menu_details_nid = $tnode->get('field_menu_details')->getValue();
+          $menu_details = [];
+          foreach ($menu_details_nid as $menu_value) {
+            $wrapper = Paragraph::load($menu_value['target_id']);
+            $display_title = $wrapper->get('field_menu_display_name')->value;
+          }
+          $title_slug = \Drupal::service('pathauto.alias_cleaner')->cleanString($display_title);
+          $links .=
+            '<li class="en first ' .
+            $active .
+            '"><a href="/' .
+            $key .
+            '/conferences/' .
+            $nid .
+            '/' .
+            $type .
+            '/' .
+            $title_slug .
+            '" class="language-link ' .
+            $active .
+            '" xml:lang="en" hreflang="en">' .
+            $enabled_lang[$key]->native .
+            '</a></li>';
+          break;
+
+        default:
+          $links .= '<li class="en first ' . $active . '"><a href="/' . $key . '/conferences/' . $value->nid . '/' . $type . '" class="language-link ' . $active . '" xml:lang="en" hreflang="en">' . $enabled_lang[$key]->native . '</a></li>';
+          break;
+      }
+    }
+    if (count($trans_exist) != count($enabled_lang)) {
+      foreach ($enabled_lang as $key => $value) {
+        $active = $key == $language_name ? 'active' : '';
+        if (empty($trans_exist[$key])) {
+          switch ($type) {
+            case 'detail':
+            case 'listing':
+              $links .=
+                '<li class="en last ' .
+                $active .
+                '"><a href="/' .
+                $key .
+                '/conferences/' .
+                $nid .
+                '/' .
+                $type .
+                '/' .
+                $title_slug .
+                '" class="language-link ' .
+                $active .
+                '" xml:lang="en" hreflang="en">' .
+                $enabled_lang[$key]->native .
+                '</a></li>';
+              break;
+
+            default:
+              $links .= '<li class="en last ' . $active . '"><a href="/' . $key . '/conferences/' . $nid . '/' . $type . '" class="language-link ' . $active . '" xml:lang="en" hreflang="en">' . $enabled_lang[$key]->native . '</a></li>';
+              break;
+          }
+        }
+      }
+    }
+    $links .= '</ul>';
+    return $links;
+  }
+  else {
+    $language_switcher = module_invoke('locale', 'block_view', 'language');
+    return $language_switcher['content'];
+  }
+}
+
+/**
+ * Implementation of hook_preprocess_node().
+ *
+ * Override or insert variables into node template.
+ */
+function unfpa_offices_conferences_preprocess_node(&$variables) {
+  global $base_url;
+  $language_name = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  if ($language_name == 'en') {
+    $url_lang = "";
+  }
+  else {
+    $url_lang = "/" . $language_name;
+  }
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if (isset($variables['node']) && is_object($variables['node'])) {
+    $node = $variables['node'];
+    $variables['base_url'] = $base_url;
+    if ($node->getType() == 'conference') {
+      $variables['module_path'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('unfpa_offices_conferences');
+      // Questions and Answers.
+      $questions_and_answers = $node->get('field_questions_and_answers')->getValue();
+      $questions_answers_details = [];
+      foreach ($questions_and_answers as $value) {
+        $questions_and_answers_wrapper = Paragraph::load($value['target_id']);
+        $questions_answers_details[$value['target_id']]['question'] = $questions_and_answers_wrapper->get('field_question')->value;
+        $questions_answers_details[$value['target_id']]['answer'] = $questions_and_answers_wrapper->get('field_answer')->value;
+      }
+      $variables['questions_answers_details'] = $questions_answers_details;
+      $variables['about_conference_title'] = $node->get('field_about_conference_title')->value;
+      $variables['question_and_answer_title'] = $node->get('field_question_and_answer_title')->value;
+      $variables['about_summary'] = !empty($node->field_about_summary) ? $node->get('field_about_summary')->value : '';
+      $variables['about_details'] = !empty($node->field_about_details) ? $node->get('field_about_details')->value : '';
+      $variables['about_image'] = !empty($node->field_about_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->field_about_image->entity->getFileUri()) : '';
+      $variables['is_about_image'] = empty($variables['about_image']) ? 'without-image' : '';
+      $variables['theme_hook_suggestions'][] = 'node_conference';
+      $variables['image_caption'] = !empty($node->field_image_caption) ? $node->get('field_image_caption')->value : '';
+    }
+    if ($node->getType() == 'program') {
+      $variables['module_path'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('unfpa_offices_conferences');
+      $variables['title'] = $node->label();
+      $variables['location'] = !empty($node->field_location) ? $node->get('field_location')->value : '';
+      $variables['start_date'] = isset($node->field_date->value) ? \Drupal::service('date.formatter')->format(strtotime($node->field_date->value), 'custom', 'd/m/y') : '';
+      $variables['end_date'] = isset($node->field_end_date->value) ? \Drupal::service('date.formatter')->format(strtotime($node->field_end_date->value), 'custom', 'd/m/y') : '';
+      $variables['start_time'] = !empty($node->field_date) ? date('H:i', $node->get('created')->value) : '';
+      $variables['end_time'] = !empty($node->field_end_date) ? date('H:i', $node->get('created')->value) : '';
+      $variables['body'] = !$node->get('body')->isEmpty() ? $node->get('body')->value : '';
+      $variables['banner_image'] = !empty($node->field_banner_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->field_banner_image->entity->getFileUri()) : '';
+      $speakers_data = $node->get('field_related_speaker')->getValue();
+      $related_speakers = [];
+      foreach ($speakers_data as $key => $value) {
+        $related_speakers[$key]['path_program'] = $base_url . '/' . $language_name . '/modal/nojs/view/' . $value['entity']->nid;
+        $related_speakers[$key]['title'] = $value['entity']->title;
+        $related_speakers[$key]['designation'] = !empty($value['entity']->field_designation) ? $value['entity']->get('field_designation')->value : '';
+        $related_speakers[$key]['profile_image'] = !empty($value['entity']->field_profile_image) ? \Drupal::service('file_url_generator')->generateAbsoluteString($value['entity']->get('field_profile_image')->entity->getFileUri()) : '';
+      }
+      $variables['related_speakers'] = $related_speakers;
+      $fid = $node->get('field_documents')->getValue();
+      $variables['document_data'] = [];
+      if (!empty($fid)) {
+        foreach ($fid as $key => $value) {
+          $field_id = $value['value'];
+          $DocData = \Drupal::entityTypeManager()->getStorage('file')->load($field_id);
+          $data[$key]['language_doc'] = !empty($DocData[$field_id]->field_file_upload->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($DocData[$field_id]->get('field_file_upload')->entity->getFileUri()) : '';
+          $data[$key]['document_name'] = !empty($DocData[$field_id]->field_document_name->entity) ? $DocData[$field_id]->get('field_document_name')->getValue() : '';
+          $lid = !empty($DocData[$field_id]->field_available_languages->entity) ? $DocData[$field_id]->get('field_available_languages')->getValue()[0]['target_id'] : '';
+          $languageData = Node::load($lid);
+          $data[$key]['language'] = $languageData->title;
+        }
+        $variables['document_data'] = $data;
+      }
+
+      $entity_storage = \Drupal::entityTypeManager()->getStorage('node');
+      $result = $entity_storage->getQuery()
+        ->condition('type', 'conference')
+        ->range(0, 1)
+        ->execute();
+
+      $conference_nid = array_values($result);
+      $conference_nid = $conference_nid[0];
+      $conference_node_default = Node::load($conference_nid);
+      if ($conference_node_default->hasTranslation($language_name)) {
+        $conference_node = $conference_node_default->getTranslation($language_name);
+      }
+      else {
+        $conference_node = $conference_node_default;
+      }
+      $variables['about_url'] = $base_url . '/' . $language_name . \Drupal::service('path.current')->getPath();
+      $variables['programme'] = $base_url . '/' . $url_lang . 'conferences/' . $conference_node->id() . '/programme#tab';
+    }
+    if ($node->getType() == 'speaker') {
+      $variables['module_path'] = $base_url . '/' . \Drupal::service('extension.list.module')->getPath('unfpa_offices_conferences');
+      $variables['title'] = $node->label();
+      $variables['created'] = !empty($node->created) ? date('Y-m-d H:i', $node->get('created')->value) : '';
+      $variables['body'] = !$node->get('body')->isEmpty() ? $node->get('body')->value : '';
+      $variables['banner_image'] = !empty($node->field_profile_image->entity) ? \Drupal::service('file_url_generator')->generateAbsoluteString($node->field_profile_image->entity->getFileUri()) : '';
+      $variables['featured'] = $node->get('field_featured')->value;
+      if ($variables['featured'] == 1) {
+        $variables['speaker_class'] = 'featured';
+      }
+      else {
+        $variables['speaker_class'] = '';
+      }
+
+      $entity_storage = \Drupal::entityTypeManager()->getStorage('node');
+      $result = $entity_storage->getQuery()
+        ->condition('type', 'conference')
+        ->range(0, 1)
+        ->execute();
+
+      $conference_nid = array_values($result);
+      $conference_nid = $conference_nid[0];
+      $conference_node_default = Node::load($conference_nid);
+      if ($conference_node_default->hasTranslation($language_name)) {
+        $conference_node = $conference_node_default->getTranslation($language_name);
+      }
+      else {
+        $conference_node = $conference_node_default;
+      }
+      $variables['speakers_path'] = $base_url . '/' . $url_lang . 'conferences/' . $conference_node->id() . '/speakers#tab';
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_html_alter().
+ */
+function unfpa_offices_conferences_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute();
+  if ($is_admin) {
+    return TRUE;
+  }
+  if (\Drupal::routeMatch()->getRouteName() == 'conference_page.page_render') {
+    $suggestions[] = 'page_conference';
+  }
+}
+
+/**
+ * Get share tags locale in a form of en_US.
+ *
+ * Used by og:locale sharing meta tag.
+ *
+ * @return string
+ *   Locale information in form of 'en_US', 'fr_FR', etc.
+ */
+function unfpa_offices_conferences_share_get_locale() {
+  $language_name = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $lang = $language_name;
+  $country = $lang;
+
+  if ($lang == 'en') {
+    $country = 'us';
+  }
+
+  return $lang . '_' . strtoupper($country);
+}
+
+/**
+ * Function to get share card details.
+ */
+function unfpa_offices_conferences_share_details($data) {
+  $metatag = [];
+
+  $share_url = $data['url'];
+  $share_image = $data['share_image'];
+  $share_title = $data['share_title'];
+  $share_description = !empty($data['share_description']) ? $data['share_description'] : t('Ministerial Conference on Demographic Resilience');
+  /* --- Attach Share Meta Tags --- */
+
+  $negotiator = \Drupal::service('domain.negotiator');
+  $domain = $negotiator->getActiveDomain();
+  if (!empty($domain)) {
+    $domain_id = $domain->id();
+  }
+  if ($domain_id == 'eeca_unfpa_org') {
+    if ($share_title == "About") {
+      $title = "UNFPA EECA | Shaping Europe's Demographic Future";
+    }
+    else {
+      $title = "UNFPA EECA | " . $share_title;
+    }
+    $description = "Shaping Europe's Demographic Future " . $share_description;
+  }
+  else {
+    $title = $domain->get('name') . " | " . $share_title;
+    $description = $share_description;
+  }
+
+  // Meta tags thats don't change dynamically.
+  $og_locale = unfpa_offices_conferences_share_get_locale();
+  $og_sitename = \Drupal::config('system.site')->get('name');
+  $og_updated_time = time();
+  $og_type = 'article';
+  $tw_site = '@UNFPA';
+  $tw_card = 'summary_large_image';
+  $fb_app_id = '2280985865254142';
+  $metatag = [
+    [
+      '#tag' => 'title',
+      '#value' => $title,
+      '#weight' => 33,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'description',
+        'content' => $description,
+      ],
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'twitter:site',
+        'content' => $tw_site,
+      ],
+      '#weight' => 27,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'twitter:card',
+        'content' => $tw_card,
+      ],
+      '#weight' => 28,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'twitter:url',
+        'content' => $share_url,
+      ],
+      '#weight' => 29,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'twitter:title',
+        'content' => $share_title,
+      ],
+      '#weight' => 30,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'twitter:description',
+        'content' => $share_description,
+      ],
+      '#weight' => 32,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'name' => 'twitter:image',
+        'content' => $share_image,
+      ],
+      '#weight' => 31,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'fb:app_id',
+        'content' => $fb_app_id,
+      ],
+      '#weight' => 26,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:description',
+        'content' => $share_description,
+      ],
+      '#weight' => 25,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:image',
+        'content' => $share_image,
+      ],
+      '#weight' => 21,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:image:height',
+        'content' => '628',
+      ],
+      '#weight' => 23,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:image:width',
+        'content' => '1200',
+      ],
+      '#weight' => 22,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:image:url',
+        'content' => $share_url,
+      ],
+      '#weight' => 24,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:title',
+        'content' => $share_title,
+      ],
+      '#weight' => 20,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:url',
+        'content' => $share_url,
+      ],
+      '#weight' => 19,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:type',
+        'content' => $og_type,
+      ],
+      '#weight' => 18,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:updated_time',
+        'content' => $og_updated_time,
+      ],
+      '#weight' => 17,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:locale',
+        'content' => $og_locale,
+      ],
+      '#weight' => 16,
+    ],
+    [
+      '#tag' => 'meta',
+      '#attributes' => [
+        'property' => 'og:site_name',
+        'content' => $og_sitename,
+      ],
+      '#weight' => 15,
+    ],
+  ];
+  return $metatag;
+}
+
+/**
+ * {@inheritdoc}
+ */
+function unfpa_offices_conferences_preprocess_views_view__unfpa_offices_conferences__resource_documents(&$variables) {
+  global $base_url;
+  $module_path = $base_url . '/' . \Drupal::service('module_handler')->getModule('unfpa_offices_conferences')->getPath();
+  $variables['module_path'] = $module_path;
+  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $variables['language'] = $language;
+  $variables['pdf_url'] = '';
+  $variables['views_rows'] = $variables['rows'][0]['#rows'];
+  foreach ($variables['views_rows'] as $value) {
+    $resource_document = $value['#row']->_entity->field_resource_document[0]->target_id;
+    $pdf_id = $value['#row']->_entity->field_resource_document->entity->field_resource_pdf_upload[0]->target_id;
+    $pdf_upload = File::load($pdf_id)->uri[0]->value;
+    $variables['lan_title'][$value['#row']->_entity->id()] = '';
+    $lang_obj = $value['#row']->_entity->field_resource_document->entity->field_available_language[0]->entity->title->value;
+    if (!empty($pdf_upload) && !empty($lang_obj)) {
+      $menu_details[$resource_document]['pdf_url'] = \Drupal::service('file_url_generator')->generateAbsoluteString($pdf_upload);
+      $menu_details[$resource_document]['title'] = t($lang_obj);
+      $variables['lan_title'][$value['#row']->_entity->id()] .= '<option rel="' . $resource_document . '" pdf_url="' . $menu_details[$resource_document]['pdf_url'] . '">' . $menu_details[$resource_document]['title'] . '</option>';
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function unfpa_offices_conferences_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $roles = \Drupal::currentUser()->getRoles();
+  if ($form_id == "node_conference_form"|| $form_id == "node_conference_edit_form") {
+    foreach ($form["field_menu_details"]["widget"] as $key => $value) {
+      if (is_numeric($key)) {
+        unset($form["field_menu_details"][$key]["subform"]["field_list_type"]["widget"]["#options"]["_none"]);
+        unset($form["field_menu_details"][$key]["subform"]["field_page_type"]["widget"]["#options"]["_none"]);
+      }
+    }
+
+  }
+
+  if (in_array('administrator', $roles) &&
+    ($form_id == "node_conference_form" || $form_id == "node_conference_edit_form"
+    || $form_id == "node_speaker_form" || $form_id == "node_speaker_edit_form"
+    || $form_id == "node_program_form" || $form_id == "node_program_edit_form")) {
+    $form["field_skip_lang"]["#access"] = TRUE;
+  }
+  else {
+    $form["field_skip_lang"]["#access"] = FALSE;
+  }
+}
+
+/**
+ * Get translation exist for nid.
+ */
+function unfpa_offices_check_translation_exist($nid) {
+  $language_name = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $base_node = Node::load($nid);
+  if ($base_node->hasTranslation($language_name)) {
+    $translations = $base_node->getTranslation($language_name);
+    return $translations;
+  }
+  else {
+    return $base_node;
+  }
+}

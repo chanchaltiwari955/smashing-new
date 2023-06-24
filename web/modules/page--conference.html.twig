@@ -1,0 +1,248 @@
+{{ attach_library('unfpa_offices_conferences/unfpa_offices_conference_style') }}
+<header class="dskt" id="hero-reach">
+  {% if logo_color == 'white_logo '  %}
+    <div class="site-brand">
+      <a href="{{ front_page }}"><img src="{{ base_path ~ directory }}/images/UNFPA_logo_white.svg" alt="test"></a>
+    </div>
+    {% if language_switcher is not empty %}
+      <div class="site-language">{{ language_switcher }}</div>
+    {% endif %}
+    <a class="btn-share" href="#"><img src="{{ base_path ~ directory }}/images/icon-share.svg" alt="Share"></a>
+   {% else %}
+    <div class="brand">
+      {% if logo %}
+        <a href="{{ front_page }}" title="{{'Home'|t}}"><span class="logo"></span></a>
+      {% endif %}
+    </div>
+    {% if language_switcher is not empty %}
+      <div class="site-language" id="color-change">{{ language_switcher }}</div>
+    {% endif %}
+    <a class="btn-share" href="#"><img src="{{ base_path ~ directory }}/images/icon-share.svg" alt="Share"></a>
+  {% endif %}
+</header>
+{% if banner_switcher == 'full_page' or banner_switcher == 'full_page_without_effect' %}
+<!--- Hero Image Starts -->
+{% if banner_switcher == 'full_page' %}
+<div class="hero-image effect full-page" style="background-image: url({{ desktop_image }})">
+  <div class="hero-image no-effect">
+  {% elseif banner_switcher == 'full_page_without_effect' %}
+    <img class="no-effect-full" src="{{ desktop_image }}" alt="Desktop image" />
+  {% endif %}
+    <div class="scroll-to">
+      <div class="wrapper">
+        <div class="arrow-container">
+          <div class="arrow-down"><img src="{{ module_path }}/images/icon-downarrow-white.svg" alt="" /></div>
+        </div>
+        <p>{{ "Scroll down"|t }}</p>
+      </div>
+    </div>
+    <div class="hero-image_content">
+      {% if sub_title is not empty %}
+      <p class="ani-element slideDown">
+      {{ sub_title }}</p>
+      {% endif %}
+      {% if banner_title is not empty %}
+        <div class="conf-title ani-element">
+          <h2 class="">{{ banner_title }}</h2>
+        </div>
+      {% endif %}
+      {% if body is not empty %}
+      <p class="sub-text ani-element">{{ body }}</p>
+      {% endif %}
+      <div class="conf-when">
+      {% if date is not empty %}
+        <div class="when">
+          <i><img src="{{ module_path }}/images/icon-calender-white.svg" alt="Program Date" /></i>
+          {{ date }} 
+          {% if end_date is not empty %}
+          {{ end_date }}
+          {% endif %}
+        </div>
+      {% endif %}
+        {% if location is not empty %}
+        <div class="where">
+          <i><img src="{{ module_path }}/images/icon-location-white.svg" alt="Where" /></i>
+          {{ location }}
+        </div>
+        {% endif %}
+      </div>
+      <a class="btn btn-register" href="{{ external_link }}" target="_blank"></a>
+    </div>
+  </div>
+{% else %}
+  <div class="hero-image half-hero">
+  {% if desktop_image %}
+    <img class="half-hero-img" src="{{ file_url(desktop_image) }}" alt="" />
+    {% endif %}
+    <div class="hero-image_content half">
+      {% if sub_title %}
+      <p class="ani-element slideDown">{{ sub_title }}</p>
+      {% endif %}
+      {% if banner_title %}
+      <div class="conf-title ani-element">
+        <h2 class="">{{ banner_title }}</h2>
+      </div>
+      {% endif %}
+      {% if body %}
+      <p class="sub-text ani-element">{{ body }}</p>
+      {% endif %}
+      <div class="conf-when">
+        <div class="when">
+          {{ date }}
+          {% if end_date is not empty %}
+          {{ end_date }}
+          {% endif %}
+          <i><img src="{{ module_path }}/images/icon-calender-white.svg" alt="Program Date" /></i>
+        </div>
+        {% if location is not empty %}
+        <div class="where">
+          <i><img src="{{ module_path }}/images/icon-location-white.svg" alt="Where" /></i>{{ location }}
+        </div>
+        {% endif %}
+      </div>
+      {% if external_link_title %}
+      <a class="btn btn-register" href="{{ external_link }}">{{ external_link_title }}</a>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+  {% if banner_switcher == 'full_page' %}
+  <div class="container-fluid with-fixed-hero">
+  {% else %}
+    <div class="container-fluid with-half-hero">
+  {% endif %}
+      <div class="row">
+        <!-- Top navigation -->
+        <div id="sticky-anchor"></div>
+        <div class="navigation-cate">
+          <div class="wrapper">
+            <ul class="conf-nav" id="tab">
+              {% for key, item in menu_details %}
+                {% if menu_name == item.display_name %} 
+                  {% set class = 'active' %} 
+                  {% set menu_redirect_url = '' %} 
+                {% else %} 
+                  {% set class = '' %}
+                  {% if item.icon_url is not empty %} 
+                    {% set menu_redirect_url = item.icon_url %}
+                    {% set target = ' _blank' %}
+                  {% else %}
+                    {% set menu_redirect_url = item.menu_redirect_url ~ '#tab' %} 
+                  {% endif %}
+                {% endif %}
+                <li role="navigation" class="{{ class }}">
+                  <a {% if menu_redirect_url %} href="{{ menu_redirect_url }}" {% endif %} 
+                    {% if target %} target={{ target }} {% endif %}>
+                    {% if item.menu_url %}
+                      <i><img src="{{ item.menu_url }}" alt="{{ item.title}}" /></i>
+                    {% endif %}
+                    <span>{{ item.display_name }}</span>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <!--end-->
+      </div>
+      {{ page.content }}
+      {% if related_content_display == 'yes' and conferences_related_content_count is not empty %}
+      <div class="row bg-grey-lightest index-1">
+        <div class="col-md-12">
+          <div class="container ani-element">
+            <div class="row">
+              <div class="page-content pad-top-bottom level1 related-content">
+                <h2>{{ related_content_title }}</h2>
+                {{ conferences_related_content }}
+                <div class="btn-up btn-goTop"><img src="{{ base_path ~ directory }}/images/icon-btn-arrow-up.svg" alt="go top" /></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% if footer_banner_details.banner or footer_banner_details.ptl is not empty %}
+      <div class="ftr-block margin-right-0">
+        <div class="container">
+          <div class="row wrap">
+            <div class="col-md-12">
+              {% if footer_banner_details is not empty %} {% if footer_banner_details.type == 'banner' %}
+              <div class="cta-banner"><img src="{{ footer_banner_details.banner }}" alt="" /></div>
+              {% else %}
+              <div class="partners">
+                {% for key, item in footer_banner_details.ptl %} {% if item.logo_url %}
+                <span>
+                  <a href="{{ item.logo_url }}" target="_blank"> <img src="{{ item.logo }}" alt="" /></a>
+                </span>
+                {% else %}
+                <span><img src="{{ item.logo}}" alt="" /></span> {% endif %} {% endfor %}
+              </div>
+              {% endif %}
+              {% if footer_banner_details.footer_banner_title %}
+              <p class="short-text">{{ footer_banner_details.footer_banner_title }}</p>
+              {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% if banner_switcher == 'full_page' %}
+        {% if new_home_page == 'new-home-page' %}
+          {{ common_footer }}
+        {% endif %}
+        <footer id="footer" role="contentinfo" class="clearfix">
+          <div class="max_wrapper">
+            <div class="footer_area">
+              <div id="footer_social">
+                <div id="footer_logo">{{ page.footer_logo }}</div>
+                {{ page.footer_social }}
+              </div>
+              <div id="footer_links">{{ page.footer_links }}</div>
+              {{ feed_icons }}
+            </div>
+          </div>
+        </footer>
+      {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% if new_home_page == 'new-home-page' %}
+      {{ common_footer }}
+    {% endif %}
+    <footer id="footer" role="contentinfo" class="clearfix">
+      <div class="max_wrapper">
+        <div class="footer_area">
+          <div id="footer_social">
+            <div id="footer_logo">{{ page.footer_logo }}</div>
+            {{ page.footer_social }}
+          </div>
+          <div id="footer_links">{{ page.footer_links }}</div>
+          {{ feed_icons }}
+        </div>
+      </div>
+    </footer>
+    <div class="popup-wrapper">
+      <div class="row-backto">
+        <div class="btn-close" id="btnClose"><span class="backarow"><img src="{{ module_path }}/images/icon-back-arrow.svg" alt="" /></span>{{ 'Back to page'|t }}</div>
+      </div>
+      <div class="share-card">
+        <div class="img-holder"><img src="{{ share_image }}" alt="" title="" /></div>
+        <div class="share-card__cardbody">
+          <div class="share-description">{{ share_description|raw }}</div>
+        </div>
+        <div class="social-wrapper">
+          <div class="colm-1">
+            <a href="#" class="social-link fa-sm st_facebook_custom">
+              <span>{{ "Share on Facebook"|t }}</span><i> <img src="{{ module_path }}/images/logo-facebook.svg" alt="facebok" /></i>
+            </a>
+          </div>
+          <div class="colm-2">
+            <a href="#" class="social-link fa-sm st_twitter_custom">
+              <span>{{ "Share on Twitter"|t }}</span><i><img src="{{ module_path }}/images/logo-twitter.svg" alt="twitter" /></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="overley-white"></div>
+  </div>
+</div>

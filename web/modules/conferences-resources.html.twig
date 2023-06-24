@@ -1,0 +1,33 @@
+{{ attach_library('unfpa_offices_conferences/conference_resources_style') }}
+<div class="row">
+  <div class="col-md-12">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="page-wrapper">
+            <h2>{{ 'Resources'|t }}</h2>
+            <div class="content-wrapper">
+              <div class="colm-1">
+                {{ drupal_view('unfpa_offices_conferences', 'resource_documents') }}
+              </div>
+              <div class="colm-2">
+                <div class="share-wrapper">
+                  <div class="inr-blk">
+                    <div class="btn-share-wrap">
+                      <div class="btn-share"><img src="{{ module_path }}/images/icon-share.svg" alt="share"></div>
+                      <div class="sharetext">{{ 'Share'|t }}</div>
+                    </div>
+                    <div class="top-wrapper">
+                      <div class="btn-up"><img src="{{ module_path }}/images/icon-btn-arrow-up-white.svg" alt="go top"></div>
+                      <div class="toptext">{{ 'Go to top'|t }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

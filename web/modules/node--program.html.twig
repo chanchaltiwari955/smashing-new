@@ -1,0 +1,145 @@
+{{ attach_library('unfpa_offices_conferences/conference_programme_style') }}
+<div class="row">
+  <div class="col-md-12">
+    <div class="topic-header__content">
+      <ul class="breadcrumb">
+        <li><a href="{{ about_url }}"> </a></li>
+        <li><a href="{{ programme }}">{{ 'Programme'|t }}</a></li>
+        <li>{{ title }}</li>
+      </ul>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="page-wrapper">
+            <div class="content-wrapper">
+              <div class="colm-1">
+                <div class="ct-doc-details">
+                  <div class="content-left">
+                    <h1>{{ title }}</h1>
+                    <div class="content-right">
+                      <div class="info-row">
+                        <div class="info-item">
+                          <span class="label">{{ 'START DATE'|t }}</span>
+                          <span class="info-content">{{ start_date }}</span>
+                        </div>
+                        <div class="info-item">
+                          <span class="label">{{ 'END DATE'|t }}</span>
+                          <span class="info-content">{{ end_date }}</span>
+                        </div>
+                      </div>
+                      <div class="info-row">
+                        <div class="info-item">
+                          <span class="label">{{ 'TIME'|t }}</span>
+                          <span class="info-content">
+                          {{ start_time }} {{ end_time }}
+                          </span>
+                        </div>
+                        <div class="info-item">
+                          <span class="label">{{ 'Location'|t }}</span>
+                          <span class="info-content">{{ location }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p>{{ body|raw }}</p>
+                  </div>
+                </div>
+                <div class="go-back-wrapper" data-uw-styling-context="true">
+                  <a href="{{ programme }}">
+                    <div class="btn-back" data-uw-styling-context="true"><img src="{{ module_path }}/images/icon-btn-arrow-up.svg" alt="go top" data-uw-styling-context="true" /></div>
+                  </a>
+                  <div class="toptext" data-uw-styling-context="true">{{ 'Back To Full Programme'|t }}</div>
+                </div>
+                <!-- Featured Speakers section -->
+                <div class="speakers-block prgm-ct">
+                  <h3 class="title">{{ 'Featured Speakers'|t }}</h3>
+                  {% for key, item in related_speakers %}
+                  <div class="ftr-container">
+                    <a class="show-popup" href="#">
+                      <div class="ftr-card">
+                        <div class="img-blk">
+                          <div class="img-circle">
+                            <img src="{{ item.profile_image }}" alt="" />
+                          </div>
+                        </div>
+                        <div class="cnt-blck">
+                          <h3>{{ item.title }}</h3>
+                          <p class="spk-role"></p>
+                          <p>{{ item.designation }}</p>
+                          <p></p>
+                        </div>
+                      </div>
+                    </a>
+                    <div class="ftr-card-popup" style="display: none;">
+                      <div class="popup-content">
+                        <div class="close-btn">x</div>
+                        <div class="img-blk">
+                          <div class="img-circle">
+                            <img src="{{ item.profile_image}}" alt="" />
+                          </div>
+                        </div>
+                        <div class="cnt-blck">
+                          <h3>{{ item.title }}</h3>
+                          <p class="spk-role">{{ item.designation }}</p>
+                        </div>
+                        <div class="speaker-summary">{{ item.body|raw }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% if document_data %}
+                <!-- Document Section -->
+                <div class="Prgm-doc-cont">
+                  <h3>{{ 'Programme Documents'|t }}</h3>
+                  <div class="list-wrap">
+                    {% for key, item in document_data %}
+                    <div class="row list-row">
+                      <div class="col-md-9 col-sm-7">
+                        <div class="doc-title">
+                          <i><img src="{{ module_path }}/images/icon-documents.svg" alt="" /></i>
+                          <span>{{ item.document_name }}</span>
+                        </div>
+                      </div>
+                      <div class="col-md-3 col-sm-5">
+                        <div class="form-group action-elements">
+                          <div class="dropdown-select">
+                            <select class="main-document">
+                              <option pdf_url="{{ item.language_doc }}">{{ item.language }}</option>
+                            </select>
+                          </div>
+                          <div class="doc-download-icon">
+                            <a href="{{ item.language_doc }}" download>
+                              <img src="{{ module_path }}/images/download.svg" alt="" />
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+              <div class="colm-2">
+                <div class="share-wrapper">
+                  <div class="inr-blk">
+                    <div class="btn-share-wrap">
+                      <div class="btn-share"><img src="{{ module_path }}/images/icon-share-orang.svg" alt="share" /></div>
+                      <div class="sharetext">{{ 'Share'|t }}</div>
+                    </div>
+                    <div class="top-wrapper">
+                      <div class="btn-up"><img src="{{ module_path }}/images/icon-btn-arrow-up.svg" alt="go top" /></div>
+                      <div class="toptext">{{ 'Go to top'|t }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

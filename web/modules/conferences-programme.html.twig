@@ -1,0 +1,78 @@
+{{ attach_library('unfpa_offices_conferences/conference_programme_style') }}
+<div class="row">
+	<div class="col-md-12">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 pad-right-0">
+					<div class="page-wrapper">
+						<h2>{{ 'Programme'|t }}</h2>
+						<div class="content-wrapper">
+							<div class="colm-1">
+								{% if data.provisional_programme_details %}
+									<ul class="tabs-programme">
+										{% for item in data.provisional_programme_details %}
+											<li class="tab-link {{ item.current_tab }}" data-tab="tab-{{ item.provisional_day_count }}">{{ 'Day'|t }} {{ item.alphabet_count }}</li>
+										{% endfor %}
+									</ul>
+									{% for key, item in data.provisional_programme_details %}
+										<div id="tab-{{ item.provisional_day_count }}" class="tab-content {{ item.current_tab }}">
+											<div class="pro-table-grid" data-uw-styling-context="true">
+												<h3 data-uw-styling-context="true">{{ item.main_heading }}</h3>
+												<div class="grd-row tsd" data-uw-styling-context="true">
+													<div class="grd-time" data-uw-styling-context="true">{{ 'TIME (EET, GMT+2)'|t }}</div>
+													<div class="grd-session" data-uw-styling-context="true">{{ 'SESSION'|t }}</div>
+													<div class="grd-des" data-uw-styling-context="true">{{ 'DESCRIPTION'|t }}</div>
+												</div>
+												
+												{% for key, item_child in item.content %}												
+													<div class="grd-row" data-uw-styling-context="true">
+														<div class="grd-time" data-uw-styling-context="true">{{ item_child['time'] }}</div>
+														<div class="grd-session" data-uw-styling-context="true">
+															{% if item_child['sub_title'] %}
+																{{ item_child['sub_title'] }}
+															{% endif %}
+															{% if item_child['title'] is not empty %}
+																<h4 data-uw-styling-context="true">{{ item_child['title'] }}</h4>															
+															{% endif %}
+														</div>
+														<div class="grd-des" data-uw-styling-context="true">{{ item_child['description']|raw }}</div>
+													</div>
+												{% endfor %}
+											</div>
+										</div>
+									{% endfor %}
+								{% else %}
+									{{ data.programme_body|raw }}
+								{% endif %}
+								<label>
+									<strong>{{ data.document_title }}</strong>
+								</label>
+								<div class="field--items">
+									{% for value in data.doc %}
+										<a href="{{ value.language_doc }}" class="btn default btn-download" target="_blank">
+											<strong data-uw-styling-context="true">{{ value.language }}</strong>
+										</a>
+									{% endfor %}
+								</div>
+							</div>
+							<div class="colm-2">
+								<div class="share-wrapper">
+									<div class="inr-blk">
+										<div class="btn-share-wrap">
+											<div class="btn-share"><img src="{{ module_path }}/images/icon-share-orang.svg" alt="share"></div>
+											<div class="sharetext">{{ 'Share'|t }}</div>
+										</div>
+										<div class="top-wrapper">
+											<div class="btn-up"><img src="{{ module_path }}/images/icon-btn-arrow-up.svg" alt="go top"></div>
+											<div class="toptext">{{ 'Go to top'|t }}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

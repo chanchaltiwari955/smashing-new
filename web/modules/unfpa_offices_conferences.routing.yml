@@ -1,0 +1,71 @@
+unfpa_offices_conferences.conferences_programme:
+  path: 'conferences/{node}/programme'
+  defaults:
+    _title: 'Conference Programme'
+    _controller: '\Drupal\unfpa_offices_conferences\Controller\ConferenceProgramme::unfpa_offices_conferences_programme'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+unfpa_offices_conferences.conferences_speakers:
+  path: 'conferences/{node}/speakers'
+  defaults:
+    _title: 'Conference Speakers'
+    _controller: '\Drupal\unfpa_offices_conferences\Controller\ConferenceSpeakers::unfpa_offices_conferences_speakers'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+unfpa_offices_conferences.conferences_details:
+  path: 'conferences/{node}/detail/{detail}'
+  defaults:
+    _title: 'Conference Details'
+    _controller: '\Drupal\unfpa_offices_conferences\Controller\ConferenceDetails::unfpa_offices_conferences_detail'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+unfpa_offices_conferences.conferences_news:
+  path: 'conferences/{node}/news'
+  defaults:
+    _title: 'Conference News'
+    _controller: '\Drupal\unfpa_offices_conferences\Controller\ConferenceNews::unfpa_offices_conferences_news'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+unfpa_offices_conferences.conferences_listing:
+  path: 'conferences/{node}/listing/{news}'
+  defaults:
+    _title: 'Conference News'
+    _controller: '\Drupal\unfpa_offices_conferences\Controller\ConferenceNews::unfpa_offices_conferences_news'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node
+
+unfpa_offices_conferences.conferences_resources:
+  path: 'conferences/{node}/resources'
+  defaults:
+    _title: 'Conference Resources'
+    _controller: '\Drupal\unfpa_offices_conferences\Controller\ConferenceResources::unfpa_offices_conferences_resources'
+  requirements:
+    _permission: 'access content'
+  options:
+    parameters:
+      node:
+        type: entity:node

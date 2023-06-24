@@ -1,0 +1,116 @@
+{#
+/**
+* @file
+* Default theme implementation for main view template.
+*
+* Available variables:
+* - attributes: Remaining HTML attributes for the element.
+* - css_name: A CSS-safe version of the view name.
+* - css_class: The user-specified classes names, if any.
+* - header: The optional header.
+* - footer: The optional footer.
+* - rows: The results of the view query, if any.
+* - empty: The content to display if there are no rows.
+* - pager: The optional pager next/prev links to display.
+* - exposed: Exposed widget form/info to display.
+* - feed_icons: Optional feed icons to display.
+* - more: An optional link to the next page of results.
+* - title: Title of the view, only used when displaying in the admin preview.
+* - title_prefix: Additional output populated by modules, intended to be
+*   displayed in front of the view title.
+* - title_suffix: Additional output populated by modules, intended to be
+*   displayed after the view title.
+* - attachment_before: An optional attachment view to be displayed before the
+*   view content.
+* - attachment_after: An optional attachment view to be displayed after the
+*   view content.
+* - dom_id: Unique id for every view being printed to give unique class for
+*   JavaScript.
+*
+* @see template_preprocess_views_view()
+*
+* @ingroup themeable
+*/
+#}
+{{ attach_library('unfpa_offices_conferences/unfpa_offices_conference_style') }}
+<div class="{{ classes }}">
+  {{ title_prefix }}
+  {% if title %}
+  {{ title }}
+  {% endif %}
+  {{ title_suffix }}
+  {% if header %}
+  <div class="view-header">
+    {{ header }}
+  </div>
+  {% endif %}
+  {% if exposed %}
+  <div class="view-filters">
+    {{ exposed }}
+  </div>
+  {% endif %}
+  {% if attachment_before %}
+  <div class="attachment attachment-before">
+    {{ attachment_before }}
+  </div>
+  {% endif %}
+  {% if rows %}
+  <div class="view-content">
+    {% for key, row in rows[0]['#rows'] %}
+      {% set node_title = row['#row']._entity.title.entity.label %}
+      {% set link_text = "Read More"|t %}
+      {% set module_path = bamboo_path_system('module', 'unfpa_offices_conferences') %}
+      
+      {% if row['#row']._entity.getType() == 'ct_events' %}
+        {% set date = row['#row']._entity.field_date[0].value %}
+      {% endif %}
+      <div class="row list-row">
+        <div class="col-md-4 col-sm-4 col-xs-12">
+          <div class="img-holder">
+            <img src="{{ file_url(row['#row']._entity.field_banner_image.entity.uri.value) }}" alt="{{ row['#row']._entity.field_banner_image.title }}">
+          </div>
+        </div>
+        <div class="col-md-8 col-sm-8 col-xs-12">
+          <div class="programme-content">
+            <div class="programme-content__date-location">
+              <i><img src="{{ base_url ~ '/' ~ module_path ~ '/images/icon-program.svg' }}" alt=""></i>
+              <span class="details">{{ date|striptags ~ ' - ' ~ end_date|striptags }}</span>
+            </div>
+            <div class="programme-content__date-location">
+              <i><img src="{{ base_url ~ '/' ~ module_path ~ '/images/icon-location.svg' }}" alt=""></i>
+              <span class="details">{{ row['#row']._entity.field_location[0].value }}</span>
+            </div>
+            <h3><a>{{ node_title }}</a></h3>
+            <a class="btn">{{ link_text }}<i class="secondary-arrow"></i></a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% elseif empty %}
+  <div class="view-empty">
+    {{ empty }}
+  </div>
+  {% endif %}
+  {% if pager %}
+  {{ pager }}
+  {% endif %}
+  {% if attachment_after %}
+  <div class="attachment attachment-after">
+    {{ attachment_after }}
+  </div>
+  {% endif %}
+  {% if more %}
+  {{ more }}
+  {% endif %}
+  {% if footer %}>
+  <div class="view-footer">
+    {{ footer }}
+  </div>
+  {% endif %}
+  {% if feed_icon %}
+  <div class="feed-icon">
+    {{ feed_icon }}
+  </div>
+  {% endif %}
+</div>

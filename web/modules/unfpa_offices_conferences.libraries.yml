@@ -1,0 +1,45 @@
+unfpa_offices_conference_style:
+  version: 1.x
+  css:
+    theme:
+      css/about.css: {}
+      css/animation.css: {}
+      css/conferences-footer.css: {}
+      css/fonts_conference.css: {}
+      css/global.css: {}
+      css/header.css: {}
+      css/hero-image.css: {}
+      https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css: {type: external}
+  js:
+    js/custom.js: {}
+    # js/conference.js: {}
+    https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js: { type: external}
+    https://ws.sharethis.com/button/buttons.js: { type: external}
+
+  dependencies:
+  - core/drupal
+  - core/jquery
+  - core/once
+  - core/drupalSettings
+
+conference_news_style:
+  css:
+    theme:
+      css/news.css: {}
+
+conference_programme_style:
+  css:
+    theme:
+      css/programme.css: {}
+
+conference_resources_style:
+  css:
+    theme:
+      css/resources.css: {}
+  js:
+    js/resource_documents.js: {}
+
+conference_speaker_style:
+  css:
+    theme:
+      css/speakers.css: {}

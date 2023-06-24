@@ -1,0 +1,91 @@
+{{ attach_library('unfpa_offices_conferences/unfpa_offices_conference_style') }}
+<div class="about-wrapper">
+  <div class="first-info {{ is_about_image }}">
+    {% if about_image %}
+      <div class="img-1">
+        <figure>
+          <img src="{{ about_image }}" alt="" />
+          <figcaption>{{ image_caption }}</figcaption>
+        </figure>
+      </div>
+      <div class="content-wrapper">
+        <div class="initial-ctn">
+          <h2>{{ about_conference_title }}</h2>
+            {{ content.field_about_summary }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+  <div class="details-info">
+    <div class="content-wrapper">
+      <div class="colm-1">
+        {% if about_image is empty %}
+          <h2>{{ about_conference_title }}</h2>
+          {{ content.field_about_summary }}
+        {% endif %} 
+        {{ content.field_about_details }}
+        <!--Question and Answer section-->
+        <div class="qa-section">
+          <h2>{{ question_and_answer_title }}</h2>
+          <div class="content accordian-cnt">
+            <div class="panel-group" id="accordion">
+              {% set i = 1 %} 
+              {% for key, val in questions_answers_details %}
+              <div class="panel panel-default">
+                <!-- 1st -->
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    {% if i == 1 %}
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ key }}" class="">
+                      {{ val.question|raw }}
+                    </a>
+                    {% else %}
+                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ key }}" class="collapsed">
+                      {{ val.question|raw }}
+                    </a>
+                    {% endif %}
+                  </h4>
+                </div>
+
+                {% if i == 1 %}
+                <div id="collapse{{ key }}" class="panel-collapse collapse in">
+                  <div class="panel-body">
+                    <div class="">
+                      <p>{{ val.answer|raw }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% else %}
+                <div id="collapse{{ key }}" class="panel-collapse collapse">
+                  <div class="panel-body">
+                    <div class="">
+                      <p>{{ val.answer|raw }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <!--end-->
+      </div>
+      <div class="colm-2">
+        <div class="share-wrapper">
+          <div class="inr-blk">
+            <div class="btn-share-wrap">
+              <div class="btn-share"><img src="{{ module_path }}/images/icon-share.svg" alt="share" /></div>
+              <div class="sharetext">{{ 'share'|t }}</div>
+            </div>
+
+            <div class="top-wrapper">
+              <div class="btn-up"><img src="{{ module_path }}/images/icon-btn-arrow-up-white.svg" alt="go top" /></div>
+              <div class="toptext">{{ 'Go to top'|t }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

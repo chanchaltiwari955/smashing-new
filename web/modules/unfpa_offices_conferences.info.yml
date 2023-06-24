@@ -1,0 +1,5 @@
+name: 'UNFPA Offices Conferences'
+type: module
+description: 'List of conference, speaker and program.'
+core_version_requirement: ^9 || ^10
+package: 'UNFPA Offices Content'

@@ -1,0 +1,50 @@
+{{ attach_library('unfpa_offices_conferences/conference_news_style') }}
+<div class="row">
+  <div class="col-md-12">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="page-wrapper">
+            <h2>
+              {% if data.tab_title is not empty %}
+                {{ data.tab_title }}
+              {% else %}
+                {{'News'|t}}
+              {% endif %}
+            </h2>
+            <div class="content-wrapper">
+              <div class="colm-1">
+                <div class="tab-content">
+                  <div class="tab-pane fade in active" id="list-view">
+                    <div class="all-news">
+                      {% if data.default_list == 'list_view' %}
+                        {{ drupal_view('unfpa_offices_conferences', 'list_news', data.target_term_id) }}
+                      {% elseif data.default_list == 'grid_view' %}
+                        {{ drupal_view('unfpa_offices_conferences', 'grid_news', data.target_term_id) }}
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="colm-2">
+                <div class="share-wrapper">
+                  <div class="inr-blk">
+                    <div class="btn-share-wrap">
+                      <div class="btn-share"><img src="{{ module_path }}/images/icon-share.svg" alt="share"></div>
+                      <div class="sharetext">{{ 'Share'|t }}</div>
+                    </div>
+
+                    <div class="top-wrapper">
+                      <div class="btn-up"><img src="{{ module_path }}/images/icon-btn-arrow-up-white.svg" alt="go top"></div>
+                      <div class="toptext">{{ 'Go to top'|t }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
